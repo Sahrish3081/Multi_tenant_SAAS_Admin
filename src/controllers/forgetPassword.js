@@ -1,7 +1,9 @@
 import crypto from 'crypto';
 import FormData from 'form-data';
 import Mailgun from 'mailgun.js';
-import pool from '../database/db.js';
+import { db } from '#/config/client.js';
+import { users } from '#/drizzle/schema.js';
+import { eq } from 'drizzle-orm';
 const mailgun = new Mailgun(FormData);
 const mg = mailgun.client({
   username: 'api',
@@ -13,15 +15,15 @@ export async function forgetPassword(req, res) {
     if (!email) {
         return res.status(400).json({ error: 'Email is required' });
     }
-    const  userEmail=await pool.query('SELECT  * FROM users WHERE email=$1',[email]);
-    if(userEmail.rows.length===0){
+    const  userEmail=await db.select().from(users).where(eq(users.email,email));
+    if(userEmail.length===0){
         return res.status(404).json({error:"User email not found"});
     }
     /* Generate token for reset password */
     const token = crypto.randomBytes(20).toString('hex');
     console.log("Generated Token:",token);
     /* Store token in database */
-  await pool.query('UPDATE users SET reset_token=$1 WHERE email=$2',[token,email]);
+  await db.update(users).set({ reset_token: token }).where(eq(users.email,email));
    /* Send email with reset link */
 
       // 5. Send the token to the user's email inbox using Mailgun

@@ -1,4 +1,6 @@
-import pool from '../database/db.js'; 
+import { db } from '@/config/client.js';
+import { users } from '@/drizzle/schema.js';
+import { eq } from 'drizzle-orm';
 import bcrypt from 'bcrypt';
 
 export async function signup(req,res){
@@ -12,9 +14,10 @@ export async function signup(req,res){
         }
     try{
       
-      const emailExists=await pool.query('SELECT *FROM users WHERE email= $1',[email]);
+    //  const emailExists=await pool.query('SELECT *FROM users WHERE email= $1',[email]);
+    const emailExists=await db.select().from(users).where(eq(users.email,email));
         // if(emailExists)
-            if(emailExists.rows.length > 0){
+            if(emailExists.length > 0){
              return res.status(409).json({
                 success: false,
                 message: "Email already exists."
@@ -23,10 +26,12 @@ export async function signup(req,res){
         /* Hashed password store in database */
          const hashedPassword = await bcrypt.hash(password, 10);
          /* insert data in database */
-         await pool.query('INSERT INTO users  (username,email,password) VALUES($1,$2,$3)',
-            [username,email,hashedPassword]
-         )
-      
+         await db.insert(users).values({
+            username: username,
+            email: email,
+            password: hashedPassword
+         });
+
          /* successful request confirmation */
         return res.status(200).json({message: "Signup successful"});
     } catch (error) {
@@ -46,12 +51,12 @@ export async function login(req,res){
      return res.status(400).json({message:"All fields are required"});
     }
 
-    const user =await pool.query('SELECT * FROM users WHERE email=$1',[email]);
-    if(user.rows.length === 0){
+    const user =await db.select().from(users).where(eq(users.email,email));
+    if(user.length === 0){
         return res.status(404).json({message:"User not found"});
     }
     /* compare password */
-    const validPassword=await bcrypt.compare(password,user.rows[0].password);
+    const validPassword=await bcrypt.compare(password,user[0].password);
     if(!validPassword){
         return res.status(401).json({message:"Invalid password"});
     }

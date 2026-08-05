@@ -1,4 +1,6 @@
-import pool from '../database/db.js'; 
+import { db } from '../config/client.js';
+import { users } from '../drizzle/schema.js';
+import { eq } from 'drizzle-orm';
 import bcrypt from 'bcrypt';
 
 export async function resetPassword(req, res) {
@@ -15,8 +17,8 @@ export async function resetPassword(req, res) {
 
     try {
         /* check if token is valid */
-        const user = await pool.query('SELECT * FROM users WHERE reset_token = $1', [token]);
-        if (user.rows.length === 0) {
+        const user = await db.select().from(users).where(eq(users.reset_token, token));
+        if (user.length === 0) {
             return res.status(400).json({ error: "Invalid or expired token" });
         }
         
@@ -25,9 +27,7 @@ export async function resetPassword(req, res) {
        
         /* update password AND clear the token  for safety */
             /* insert into database */
-    await pool.query('UPDATE users SET password=$1 WHERE reset_token=$2',
-            [hashedPassword, token]
-         )
+    await db.update(users).set({ password: hashedPassword, reset_token: null }).where(eq(users.reset_token, token));
         
         /* FIX: CRITICAL MISSING RESPONSE LINE ADDED HERE */
         return res.status(200).json({ message: "Password has been successfully updated!" });
