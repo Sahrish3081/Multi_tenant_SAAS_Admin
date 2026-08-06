@@ -1,8 +1,8 @@
 import crypto from 'crypto';
 import FormData from 'form-data';
 import Mailgun from 'mailgun.js';
-import { db } from '#/config/client.js';
-import { users } from '#/drizzle/schema.js';
+import { db } from '#config/client.js';
+import { users } from '#drizzle/schema.js';
 import { eq } from 'drizzle-orm';
 const mailgun = new Mailgun(FormData);
 const mg = mailgun.client({
