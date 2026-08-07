@@ -1,43 +1,30 @@
-import crypto from 'crypto';
-import FormData from 'form-data';
-import Mailgun from 'mailgun.js';
+// src/controllers/forgetPassword.js
 import { db } from '#config/client.js';
 import { users } from '#drizzle/schema.js';
 import { eq } from 'drizzle-orm';
-const mailgun = new Mailgun(FormData);
-const mg = mailgun.client({
-  username: 'api',
-  key: process.env.MAILGUN_API_KEY
-});
-export async function forgetPassword(req, res) {
-    // Implementation for forget password functionality
-    const {email}= req.body;
-    if (!email) {
-        return res.status(400).json({ error: 'Email is required' });
-    }
-    const  userEmail=await db.select().from(users).where(eq(users.email,email));
-    if(userEmail.length===0){
-        return res.status(404).json({error:"User email not found"});
-    }
-    /* Generate token for reset password */
-    const token = crypto.randomBytes(20).toString('hex');
-    console.log("Generated Token:",token);
-    /* Store token in database */
-  await db.update(users).set({ reset_token: token }).where(eq(users.email,email));
-   /* Send email with reset link */
+import { generateAndSendToken } from '#services/emailService.js';
 
-      // 5. Send the token to the user's email inbox using Mailgun
-    const mailOptions = {
-      from: `Auth System <mailgun@${process.env.MAILGUN_DOMAIN}>`,
-      to: [email],
-      subject: 'Password Reset Token',
-      text: `You requested a password reset. Your secure reset token is:\n\n${token}\n\nUse this token to change your password.`
-    };
+export async function forgetPassword(req, res) {
     try {
-        await mg.messages.create(process.env.MAILGUN_DOMAIN, mailOptions);
-        res.status(200).json({ message: 'Password reset token sent to your email.' });
+        const { email } = req.body;
+
+        if (!email) {
+            return res.status(400).json({ error: 'Email is required' });
+        }
+
+        // Check karein ke user exist karta hai ya nahi
+        const userEmail = await db.select().from(users).where(eq(users.email, email));
+        if (userEmail.length === 0) {
+            return res.status(404).json({ error: "User email not found" });
+        }
+
+        // Service layer ko call kiya jo token generate karegi aur database update karegi
+       await generateAndSendToken(email, 'RESET_PASSWORD');
+
+        return res.status(200).json({ message: 'Password reset token sent to your email.' });
+
     } catch (error) {
-        console.error('Error sending email:', error);
-        res.status(500).json({ error: 'Failed to send reset email.' });
+        console.error('Error in forgetPassword:', error);
+        return res.status(500).json({ error: 'Failed to send reset email.' });
     }
 }

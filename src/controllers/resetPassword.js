@@ -1,3 +1,4 @@
+
 import { db } from '#config/client.js';
 import { users } from '#drizzle/schema.js';
 import { eq } from 'drizzle-orm';
@@ -5,35 +6,71 @@ import bcrypt from 'bcrypt';
 
 export async function resetPassword(req, res) {
     const { token, new_password, confirm_password } = req.body;
-    
-    /* validate input */
+
+    // Validate input
     if (!token || !new_password || !confirm_password) {
-        return res.status(400).json({ error: 'All fields are required.' });
+        return res.status(400).json({
+            error: 'All fields are required.'
+        });
     }
 
     if (new_password !== confirm_password) {
-        return res.status(400).json({ error: "Passwords do not match" });
+        return res.status(400).json({
+            error: 'Passwords do not match'
+        });
     }
 
     try {
-        /* check if token is valid */
-        const user = await db.select().from(users).where(eq(users.reset_token, token));
+        // Check if token exists
+        const user = await db
+            .select()
+            .from(users)
+            .where(eq(users.resetToken, token));
+
         if (user.length === 0) {
-            return res.status(400).json({ error: "Invalid or expired token" });
+            return res.status(400).json({
+                error: 'Invalid or expired token'
+            });
         }
-        
-        /* hash password */
+
+        // Check token expiry
+        if (!user[0].tokenExpiresAt || user[0].tokenExpiresAt < new Date()) {
+            return res.status(400).json({
+                error: 'Invalid or expired token'
+            });
+        }
+
+        // Check if token has already been used
+        if (user[0].isTokenUsed) {
+            return res.status(400).json({
+                error: 'Token has already been used'
+            });
+        }
+
+        // Hash new password
         const hashedPassword = await bcrypt.hash(new_password, 10);
-       
-        /* update password AND clear the token  for safety */
-            /* insert into database */
-    await db.update(users).set({ password: hashedPassword, reset_token: null }).where(eq(users.reset_token, token));
-        
-        /* FIX: CRITICAL MISSING RESPONSE LINE ADDED HERE */
-        return res.status(200).json({ message: "Password has been successfully updated!" });
-            
+
+        // Update password and mark token as used
+        await db
+            .update(users)
+            .set({
+                password: hashedPassword,
+                isTokenUsed: true,
+                resetToken: null,
+                tokenExpiresAt: null
+            })
+            .where(eq(users.resetToken, token));
+
+        return res.status(200).json({
+            message: 'Password has been successfully updated!'
+        });
+
     } catch (error) {
-        console.error("Reset Password Error :", error);
-        return res.status(500).json({ message: "Internal server error", error: error.message });
+        console.error('Reset Password Error:', error);
+
+        return res.status(500).json({
+            error: 'Internal server error'
+        });
     }
 }
+

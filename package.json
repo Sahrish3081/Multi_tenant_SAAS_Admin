@@ -5,8 +5,8 @@
   "main": "src/server.js",
   "type": "module",
   "scripts": {
-    "db:migrate":"drizzle-kit migrate",
-    "db:generate":"drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:generate": "drizzle-kit generate",
     "studio": "drizzle-kit studio",
     "start": "node src/server.js",
     "dev": "node src/server.js",
@@ -16,7 +16,10 @@
     "#drizzle/*": "./src/drizzle/*",
     "#controllers/*": "./src/controllers/*",
     "#routes/*": "./src/routes/*",
-    "#config/*": "./src/config/*"
+    "#config/*": "./src/config/*",
+    "#services/*": "./src/services/*",
+    "#utils/*": "./src/utils/*",
+     "#validators/*": "./src/validators/*"
   },
   "keywords": [],
   "author": "",
@@ -29,7 +32,8 @@
     "form-data": "^4.0.6",
     "jsonwebtoken": "^9.0.3",
     "mailgun.js": "^13.3.0",
-    "pg": "^8.22.0"
+    "pg": "^8.22.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "drizzle-kit": "^0.31.10"

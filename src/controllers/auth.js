@@ -2,18 +2,46 @@ import { db } from '#config/client.js';
 import { users } from '#drizzle/schema.js';
 import { eq } from 'drizzle-orm';
 import bcrypt from 'bcrypt';
+import { signupValidation, loginValidation } from '#validators/authValidation.js';
 
 /* SIGNUP SYSTEM */
 export async function signup(req, res) {
-    const { username, email, password, confirm_password } = req.body;
+
+    // const { username, email, password, confirm_password } = req.body;
     
     /* Validate fields */
-    if (!username || !email || !password || !confirm_password) {
-        return res.status(400).json({ message: "All fields are required" });
+    // if (!username || !email || !password || !confirm_password) {
+    //     return res.status(400).json({ message: "All fields are required" });
+    // }
+    // if (password !== confirm_password) {
+    //     return res.status(400).json({ message: "Passwords do not match" });
+    // }
+
+    
+    // const validation = signupValidation.safeParse(req.body);
+    // if (!validation.success) {
+    //     return res.status(400).json({
+    //         success: false,
+    //         errors: validation.error.errors.map(err => ({
+    //             field: err.path[0],
+    //             message: err.message
+    //         }))
+    //     });
+    // }
+
+    /* throw error in valid form  */
+    const validation = signupValidation.safeParse(req.body);
+    
+    if (!validation.success) {
+        return res.status(400).json({
+            success: false,
+            message: "Validation failed",
+            errors: validation.error.flatten().fieldErrors 
+        });
     }
-    if (password !== confirm_password) {
-        return res.status(400).json({ message: "Passwords do not match" });
-    }
+
+    // Safely extracting sanitized and parsed fields from Zod validation context
+    const { username, email, password } = validation.data;
 
     try {
         const emailExists = await db.select().from(users).where(eq(users.email, email));
@@ -44,12 +72,37 @@ export async function signup(req, res) {
 
 /* LOGIN SYSTEM */
 export async function login(req, res) {
-    const { email, password } = req.body;
+    
+    // const { email, password } = req.body;
     
     /* validate fields */
-    if (!email || !password) {
-        return res.status(400).json({ message: "All fields are required" });
+    // if (!email || !password) {
+    //     return res.status(400).json({ message: "All fields are required" });
+    // }
+
+    // const validation = loginValidation.safeParse(req.body);
+    // if (!validation.success) {
+    //     return res.status(400).json({
+    //         success: false,
+    //         errors: validation.error.errors.map(err => ({
+    //             field: err.path[0],
+    //             message: err.message
+    //         }))
+    //     });
+    // }
+
+    // Standardizing centralized login error schemas with safe structure
+    const validation = loginValidation.safeParse(req.body);
+    
+    if (!validation.success) {
+        return res.status(400).json({
+            success: false,
+            message: "Validation failed",
+            errors: validation.error.flatten().fieldErrors
+        });
     }
+
+    const { email, password } = validation.data;
 
     try {
         const user = await db.select().from(users).where(eq(users.email, email));
