@@ -1,5 +1,5 @@
 import { integer, pgTable, serial, varchar, timestamp, boolean } from 'drizzle-orm/pg-core';
-
+/* User Table */
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),
   username: varchar('username', { length: 50 }).notNull(),
@@ -15,10 +15,31 @@ export const users = pgTable('users', {
 
 isEmailVerified: boolean('is_email_verified').default(false),/* check mail is verified or not */
 });
-
+/* Work space table */
 export const workspace = pgTable('workspaces', {
   id: serial('id').primaryKey(),
   workspaceName: varchar('workspace_name', { length: 50 }).notNull(),
   createdBy: integer('created_by').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+/* Workspace member table */
+export const workspaceMembers = pgTable('workspace_members', {
+    id: serial('id').primaryKey(),
+    memberName: varchar('username', { length: 50 }).notNull(),
+    userId: integer('user_id')
+        .notNull()
+        .references(() => users.id),
+
+    workspaceId: integer('workspace_id')
+        .notNull()
+        .references(() => workspace.id),
+
+    role: varchar('role', { length: 20 }).notNull(),
+    
+    assignedBy: varchar('assigned_by')
+        .notNull(),
+        
+    createdAt: timestamp('created_at')
+        .defaultNow()
+        .notNull(),
 });

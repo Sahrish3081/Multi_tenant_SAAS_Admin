@@ -6,7 +6,8 @@ import { emailVerification } from "#controllers/emailVerification.js";
 import { verifyEmail } from "#controllers/isVerifiedEmail.js";
 import { authMiddleware } from "#middleware/auth.js";
 import {  profileController } from "#controllers/profile.js";
-import { workspaceCreate } from "#controllers/workspace.js"
+import { workspaceCreate } from "#controllers/workspace.js";
+import { workSpaceMembers } from "#controllers/workSpaceMember.js";
 const router = express.Router();
 
 router.post('/signup', signup);
@@ -18,5 +19,5 @@ router.post('/verify-Email',verifyEmail);
 // Protected route
 router.get("/profile", authMiddleware, profileController);
 router.post("/workspace", authMiddleware, workspaceCreate);
-
+router.post("/Members", authMiddleware, workSpaceMembers);
 export default router;
