@@ -1,4 +1,4 @@
-import { pgTable, serial, varchar, timestamp, boolean } from 'drizzle-orm/pg-core';
+import { integer, pgTable, serial, varchar, timestamp, boolean } from 'drizzle-orm/pg-core';
 
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),
@@ -14,4 +14,11 @@ export const users = pgTable('users', {
   isTokenUsed: boolean('is_token_used').default(false), // One-time verification check
 
 isEmailVerified: boolean('is_email_verified').default(false),/* check mail is verified or not */
+});
+
+export const workspace = pgTable('workspaces', {
+  id: serial('id').primaryKey(),
+  workspaceName: varchar('workspace_name', { length: 50 }).notNull(),
+  createdBy: integer('created_by').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
 });
