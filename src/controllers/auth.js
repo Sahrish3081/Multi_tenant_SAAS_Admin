@@ -2,6 +2,7 @@ import { db } from '#config/client.js';
 import { users } from '#drizzle/schema.js';
 import { eq } from 'drizzle-orm';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import { signupValidation, loginValidation } from '#validators/authValidation.js';
 
 /* SIGNUP SYSTEM */
@@ -40,7 +41,7 @@ export async function signup(req, res) {
         });
     }
 
-    // Safely extracting sanitized and parsed fields from Zod validation context
+    
     const { username, email, password } = validation.data;
 
     try {
@@ -71,7 +72,7 @@ export async function signup(req, res) {
 }
 
 /* LOGIN SYSTEM */
-export async function login(req, res) {
+// export async function login(req, res) {
     
     // const { email, password } = req.body;
     
@@ -91,9 +92,12 @@ export async function login(req, res) {
     //     });
     // }
 
-    // Standardizing centralized login error schemas with safe structure
+//}
+
+
+export async function login(req, res) {
     const validation = loginValidation.safeParse(req.body);
-    
+
     if (!validation.success) {
         return res.status(400).json({
             success: false,
@@ -105,20 +109,59 @@ export async function login(req, res) {
     const { email, password } = validation.data;
 
     try {
-        const user = await db.select().from(users).where(eq(users.email, email));
+        // 1. Find user from database using email
+        const user = await db
+            .select()
+            .from(users)
+            .where(eq(users.email, email));
+
         if (user.length === 0) {
-            return res.status(404).json({ message: "User not found" });
+            return res.status(404).json({
+                message: "User not found"
+            });
         }
 
-        /* compare password */
-        const validPassword = await bcrypt.compare(password, user[0].password);
+        // 2. Verify password
+        const validPassword = await bcrypt.compare(
+            password,
+            user[0].password
+        );
+
         if (!validPassword) {
-            return res.status(401).json({ message: "Invalid password" });
+            return res.status(401).json({
+                message: "Invalid password"
+            });
         }
 
-        return res.status(200).json({ message: "Login successful" });
+        // 3. Get user information from database
+        const userId = user[0].id;
+        const userEmail = user[0].email;
+
+        // 4. Create JWT payload
+        const payload = {
+            id: userId,
+            email: userEmail
+        };
+
+        // 5. Generate JWT
+        const token = jwt.sign(
+            payload,
+            process.env.JWT_SECRET,
+            { expiresIn: '72h' }
+        );
+
+        // 6. Send token to client
+        return res.status(200).json({
+            message: "Login successful",
+            token: token
+        });
+
     } catch (error) {
-        console.log("Login Error :", error);
-        return res.status(500).json({ message: "Internal server error", error: error.message });
+        console.log("Login Error:", error);
+
+        return res.status(500).json({
+            message: "Internal server error",
+            error: error.message
+        });
     }
 }

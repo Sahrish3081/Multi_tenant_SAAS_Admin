@@ -19,7 +19,9 @@
     "#config/*": "./src/config/*",
     "#services/*": "./src/services/*",
     "#utils/*": "./src/utils/*",
-     "#validators/*": "./src/validators/*"
+    "#validators/*": "./src/validators/*",
+    "#templates/*": "./src/templates/*",
+    "#middleware/*": "./src/middleware/*"
   },
   "keywords": [],
   "author": "",

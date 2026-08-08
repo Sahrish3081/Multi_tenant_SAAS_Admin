@@ -4,8 +4,10 @@ import Mailgun from 'mailgun.js';
 import { db } from '#config/client.js';      
 import { users } from '#drizzle/schema.js';   
 import { eq } from 'drizzle-orm';
-import { generateSecureToken } from '#utils/cryptoUtils.js'; // Utils se import
-
+import { generateSecureToken , hashToken } from '#utils/cryptoUtils.js'; // Utils se import
+import { resetPasswordEmail , verificationEmail} from '#templates/email.js';
+const token = generateSecureToken();
+const hashedToken = hashToken(token);
 const mailgun = new Mailgun(formData);
 const mg = mailgun.client({
   username: 'api',
@@ -13,12 +15,12 @@ const mg = mailgun.client({
 });
 
 // Email sending logic
-export async function sendEmailNotification(email, subject, text) {
+export async function sendEmailNotification(email, subject, html) {
   const mailOptions = {
     from: `Auth System <mailgun@${process.env.MAILGUN_DOMAIN}>`,
     to: [email],
     subject: subject,
-    text: text
+    html: html
   };
 
   await mg.messages.create(process.env.MAILGUN_DOMAIN, mailOptions);
@@ -30,26 +32,39 @@ export const generateAndSendToken = async (email, type) => {
   const token = generateSecureToken();
   const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 Mins
 
-  // Database (Drizzle) update
-  await db.update(users)
-    .set({ 
-        resetToken: token, 
+     const result = 
+await db.update(users)
+    .set({
+        resetToken: hashedToken,
         tokenExpiresAt: expiresAt,
-        isTokenUsed: false 
+        isTokenUsed: false
     })
-    .where(eq(users.email, email));
+    .where(eq(users.email, email))
+        .returning({
+            id: users.id,
+            email: users.email,
+            resetToken: users.resetToken,
+            tokenExpiresAt: users.tokenExpiresAt,
+            isTokenUsed: users.isTokenUsed
+        });
+
+    console.log("Database updated:", result);
+
+
+  let subject;
+  let html;
+
+if (type === 'RESET_PASSWORD') {
+    subject = 'Reset Your Password';
+    html = resetPasswordEmail(token);
+} 
+else if (type === 'EMAIL_VERIFICATION') {
+    subject = 'Verify Your Email Address';
+    html = verificationEmail(token);
+}
  
-  let subject, text;
-  
-  if (type === 'RESET_PASSWORD') {
-    subject = 'Password Reset Token';
-    text = `You requested a password reset. Your secure reset token is:\n\n${token}\n\nUse this token to change your password.`;
-  } else if (type === 'EMAIL_VERIFICATION') {
-    subject = 'Verify Your Email';
-    text = `Welcome! Please verify your email. Your secure verification token is:\n\n${token}\n\nThis token will expire in 15 minutes.`;
-  }
 
   // Mailgun function call
-  await sendEmailNotification(email, subject, text);
+  await sendEmailNotification(email, subject, html);
   return true;
 };
