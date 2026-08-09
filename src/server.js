@@ -1,17 +1,20 @@
-import "dotenv/config";
 import express from "express";
-import dotenv from "dotenv";
-import router from "#routes/auth.js";
 import "dotenv/config";
+import dotenv from "dotenv";
+
+import { auth, workspace } from "#routes/route.js";
 
 dotenv.config();
+
 const app = express();
+
 app.use(express.json());
 
-// Mounting modular routes
-app.use("/api/auth", router);
+app.use("/api/v1/auth", auth);
+app.use("/api/v1/workspace", workspace);
 
 const PORT = process.env.PORT || 3000;
+
 app.listen(PORT, () => {
   console.log(`Clean MVC Server running on port ${PORT}`);
 });

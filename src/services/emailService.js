@@ -14,6 +14,8 @@ const mg = mailgun.client({
   key: process.env.MAILGUN_API_KEY || ''
 });
 
+
+
 // Email sending logic
 export async function sendEmailNotification(email, subject, html) {
   const mailOptions = {
