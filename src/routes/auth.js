@@ -8,6 +8,8 @@ import { authMiddleware } from "#middleware/auth.js";
 import {  profileController } from "#controllers/profile.js";
 import { workspaceCreate } from "#controllers/workspace.js";
 import { workSpaceMembers } from "#controllers/workSpaceMember.js";
+import { ownerMiddleware } from  "#middleware/owner.js";
+import { deleteMemberFromWorkspace } from "#controllers/deleteMembers.js";
 const router = express.Router();
 
 router.post('/signup', signup);
@@ -19,5 +21,6 @@ router.post('/verify-Email',verifyEmail);
 // Protected route
 router.get("/profile", authMiddleware, profileController);
 router.post("/workspace", authMiddleware, workspaceCreate);
-router.post("/Members", authMiddleware, workSpaceMembers);
+router.post("/members", authMiddleware, ownerMiddleware , workSpaceMembers);
+router.post("/member-delete/:memberId", authMiddleware,ownerMiddleware,  deleteMemberFromWorkspace);
 export default router;
