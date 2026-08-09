@@ -10,6 +10,7 @@ import { workspaceCreate } from "#controllers/workspace.js";
 import { workSpaceMembers } from "#controllers/workSpaceMember.js";
 import { ownerMiddleware } from  "#middleware/owner.js";
 import { deleteMemberFromWorkspace } from "#controllers/deleteMembers.js";
+import { updateRole } from "#controllers/updateRole.js";
 const router = express.Router();
 
 router.post('/signup', signup);
@@ -23,4 +24,6 @@ router.get("/profile", authMiddleware, profileController);
 router.post("/workspace", authMiddleware, workspaceCreate);
 router.post("/members", authMiddleware, ownerMiddleware , workSpaceMembers);
 router.post("/member-delete/:memberId", authMiddleware,ownerMiddleware,  deleteMemberFromWorkspace);
+
+router.put("/member-role", authMiddleware, ownerMiddleware, updateRole);
 export default router;
