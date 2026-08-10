@@ -3,8 +3,8 @@ import { workspaceMembers } from '#drizzle/schema.js';
 import { and, eq } from 'drizzle-orm';
 
 export async function deleteMemberFromWorkspace(req,res){
-  const memberId = Number(req.params.memberId);
-  const workspaceId = Number(req.body.workspaceId);
+  const memberId = req.params.memberId;
+  const workspaceId = req.body.workspaceId;
 
   if(!memberId || !workspaceId){
       return res.status(400).json({

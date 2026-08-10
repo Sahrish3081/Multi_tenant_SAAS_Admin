@@ -5,50 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1786023315796,
-      "tag": "0000_sparkling_dexter_bennett",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1786041296634,
-      "tag": "0001_low_shard",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1786085929542,
-      "tag": "0002_conscious_talos",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1786181502610,
-      "tag": "0003_light_vampiro",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1786182433719,
-      "tag": "0004_neat_ironclad",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1786196621696,
-      "tag": "0005_normal_master_mold",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1786196867873,
-      "tag": "0006_flaky_leopardon",
+      "when": 1786352620629,
+      "tag": "0000_cheerful_hardball",
       "breakpoints": true
     }
   ]

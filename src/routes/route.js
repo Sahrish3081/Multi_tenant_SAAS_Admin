@@ -12,7 +12,8 @@ import { ownerMiddleware } from  "#middleware/owner.js";
 import { deleteMemberFromWorkspace } from "#controllers/deleteMembers.js";
 import { updateRole } from "#controllers/updateRole.js";
 import { adminMiddleware } from "#middleware/admin.js";
-import { ownerOrAdminMiddleware } from "#middleware/owneroradmin.js";
+import { ownerOrAdminMiddleware } from "#middleware/ownerOrAdmin.js";
+import { createInvitation } from "#controllers/invitation.js";
 const auth = express.Router();
 
 auth.post('/signup', signup);
@@ -33,5 +34,5 @@ workspace.post("/members", authMiddleware, adminMiddleware, workSpaceMembers);/*
 workspace.post("/member-delete/:memberId", authMiddleware, ownerOrAdminMiddleware,  deleteMemberFromWorkspace);/*admin  or owner delete  */
 
 workspace.put("/member-role", authMiddleware, ownerOrAdminMiddleware, updateRole);/* owner or admin role update */
-
+workspace.post('/invitations',authMiddleware, ownerOrAdminMiddleware,createInvitation);
 export { auth, workspace };

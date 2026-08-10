@@ -1,13 +1,13 @@
-import { db } from '#config/client.js';
-import { workspace, workspaceMembers, users } from '#drizzle/schema.js';
-import { eq } from 'drizzle-orm';
+import { db } from "#config/client.js";
+import { workspace, workspaceMembers, users } from "#drizzle/schema.js";
+import { eq } from "drizzle-orm";
 
 export async function workspaceCreate(req, res) {
   const { workspaceName } = req.body;
 
   if (!workspaceName) {
     return res.status(400).json({
-      message: "Workspace name is required"
+      message: "Workspace name is required",
     });
   }
 
@@ -18,14 +18,14 @@ export async function workspaceCreate(req, res) {
     const user = await db
       .select({
         id: users.id,
-        username: users.username
+        username: users.username,
       })
       .from(users)
       .where(eq(users.id, createdBy));
 
     if (user.length === 0) {
       return res.status(404).json({
-        message: "User not found"
+        message: "User not found",
       });
     }
 
@@ -34,10 +34,10 @@ export async function workspaceCreate(req, res) {
       .insert(workspace)
       .values({
         workspaceName,
-        createdBy
+        createdBy,
       })
       .returning({
-        id: workspace.id
+        id: workspace.id,
       });
 
     // Creator automatically becomes Owner
@@ -46,21 +46,23 @@ export async function workspaceCreate(req, res) {
       userId: createdBy,
       workspaceId: newWorkspace.id,
       role: "owner",
-      assignedBy: "system"
+      assignedBy: createdBy,
     });
 
     return res.status(201).json({
       message: `${workspaceName} Workspace is successfully created`,
       workspaceId: newWorkspace.id,
-      role: "owner"
+      role: "owner",
     });
-
   } catch (error) {
     console.log("Workspace Error :", error);
 
     return res.status(500).json({
       message: "Internal server error",
-      error: error.message
+      error: error.message,
     });
   }
 }
+
+/* workspace id : 7e4038c1-694c-40f1-bca0-08d0a61c342f devsapce ki owner sahrish */
+// workspace id marketing team onwer sahrish 3a15fbf4-005b-49d3-8937-4dedc6dd8f70
