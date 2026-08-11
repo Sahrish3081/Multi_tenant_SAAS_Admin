@@ -8,6 +8,20 @@
       "when": 1786352620629,
       "tag": "0000_cheerful_hardball",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1786452287308,
+      "tag": "0001_white_maximus",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1786454727495,
+      "tag": "0002_stormy_slapstick",
+      "breakpoints": true
     }
   ]
 }

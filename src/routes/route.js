@@ -7,7 +7,7 @@ import { verifyEmail } from "#controllers/isVerifiedEmail.js";
 import { authMiddleware } from "#middleware/auth.js";
 import {  profileController } from "#controllers/profile.js";
 import { workspaceCreate } from "#controllers/workspace.js";
-import { workSpaceMembers } from "#controllers/workSpaceMember.js";
+//import { workSpaceMembers } from "#controllers/workSpaceMember.js";
 import { ownerMiddleware } from  "#middleware/owner.js";
 import { deleteMemberFromWorkspace } from "#controllers/deleteMembers.js";
 import { updateRole } from "#controllers/updateRole.js";
@@ -17,6 +17,7 @@ import { createInvitation } from "#controllers/invitation.js";
 import { acceptInvitation } from "#controllers/acceptInvitation.js";
 import { getMyWorkspace} from "#controllers/getMyWorkspace.js";
 import { getWorkspaceMembers } from  "#controllers/getWorkspaceMembers.js";
+import { changeRole } from "#controllers/changeRole.js";
 const auth = express.Router();
 
 auth.post('/signup', signup);
@@ -31,7 +32,8 @@ auth.get("/profile", authMiddleware, profileController);
 /* workspace routes */
 const workspace = express.Router();
 workspace.post("/workspace", authMiddleware, workspaceCreate);
-workspace.post("/members", authMiddleware, ownerMiddleware , workSpaceMembers);/* owner add */
+/* do not need this because invitation handle this process
+workspace.post("/members", authMiddleware, ownerMiddleware , workSpaceMembers);/* owner add 
 workspace.post("/members", authMiddleware, adminMiddleware, workSpaceMembers);/* admin add */
 
 workspace.post("/member-delete/:memberId", authMiddleware, ownerOrAdminMiddleware,  deleteMemberFromWorkspace);/*admin  or owner delete  */
@@ -41,4 +43,7 @@ workspace.post('/invitations',authMiddleware, ownerOrAdminMiddleware,createInvit
 workspace.post('/invitations/accept', authMiddleware,acceptInvitation);
 workspace.get('/my-workspaces',authMiddleware,getMyWorkspace);
 workspace.get('/workspace-members/:workspaceId', authMiddleware, getWorkspaceMembers);
+workspace.patch("/change-role/:memberId", authMiddleware,ownerOrAdminMiddleware, changeRole);
+
+workspace.delete( "/member/:memberId", authMiddleware, ownerOrAdminMiddleware, deleteMemberFromWorkspace);
 export { auth, workspace };

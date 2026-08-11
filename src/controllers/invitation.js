@@ -4,6 +4,8 @@ import { eq } from 'drizzle-orm';
 import {generateSecureToken,hashToken} from '#utils/cryptoUtils.js';
 import { invitationEmail } from '#templates/email.js';
 import { sendEmailNotification } from '#services/emailService.js';
+import { db } from '#config/client.js';
+
 export const createInvitation = async (req, res) => {
   const { email, workspaceId } = req.body;
   const invitedBy = req.user.id;
@@ -21,7 +23,7 @@ export const createInvitation = async (req, res) => {
       });
     }
 
-    //  Check workspace exists
+    // Check workspace exists
     const [existingWorkspace] = await db
       .select({
         id: workspace.id,
@@ -36,17 +38,70 @@ export const createInvitation = async (req, res) => {
       });
     }
 
+    // Check whether invited user already exists
+    const [existingUser] = await db
+      .select({
+        id: users.id,
+        email: users.email
+      })
+      .from(users)
+      .where(eq(users.email, email));
+
+    // If user exists, check workspace membership
+    if (existingUser) {
+
+      const [existingMember] = await db
+        .select({
+          id: workspaceMembers.id
+        })
+        .from(workspaceMembers)
+        .where(
+          and(
+            eq(workspaceMembers.userId, existingUser.id),
+            eq(workspaceMembers.workspaceId, workspaceId)
+          )
+        );
+
+      if (existingMember) {
+        return res.status(400).json({
+          message: "This user is already a member of this workspace"
+        });
+      }
+    }
+
+    // Check existing pending invitation
+    const [existingInvitation] = await db
+      .select({
+        id: invitations.id,
+        status: invitations.status
+      })
+      .from(invitations)
+      .where(
+        and(
+          eq(invitations.email, email),
+          eq(invitations.workspaceId, workspaceId),
+          eq(invitations.status, "PENDING")
+        )
+      );
+
+    if (existingInvitation) {
+      return res.status(400).json({
+        message: "An invitation is already pending for this email"
+      });
+    }
+
     // Generate secure invitation token
     const token = generateSecureToken();
 
     // Store only hashed token in database
     const hashedToken = hashToken(token);
 
-    //  Invitation expires after 12 hours
+    // Invitation expires after 12 hours
     const expiresAt = new Date(
-      Date.now() + 12 * 60 * 60 * 1000 );
+      Date.now() + 12 * 60 * 60 * 1000
+    );
 
-    //  Save invitation
+    // Create invitation
     const [invitation] = await db
       .insert(invitations)
       .values({
@@ -65,13 +120,13 @@ export const createInvitation = async (req, res) => {
       existingWorkspace.workspaceName
     );
 
-    // Send email through existing Mailgun service
+    // Send invitation email
     await sendEmailNotification(
       email,
       `Invitation to join ${existingWorkspace.workspaceName}`,
       html
     );
-  
+
     return res.status(201).json({
       message: "Invitation created and email sent successfully",
       invitation: {
@@ -79,8 +134,7 @@ export const createInvitation = async (req, res) => {
         email: invitation.email,
         workspaceId: invitation.workspaceId,
         status: invitation.status,
-        expiresAt: invitation.expiresAt,
-         token: token
+        expiresAt: invitation.expiresAt
       }
     });
 

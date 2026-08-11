@@ -1,4 +1,4 @@
-import {uuid,integer, pgTable, serial, varchar,timestamp, boolean,} from "drizzle-orm/pg-core";
+import {uuid,integer, unique ,pgTable, serial, varchar,timestamp, boolean,} from "drizzle-orm/pg-core";
 /* User Table */
 export const users = pgTable("users", {
  id: uuid("id").defaultRandom().primaryKey(),
@@ -29,25 +29,37 @@ export const workspace = pgTable("workspaces", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 /* Workspace member table */
-export const workspaceMembers = pgTable("workspace_members", {
- id: uuid("id").defaultRandom().primaryKey(),
-  memberName: varchar("username", { length: 50 }).notNull(),
-  userId: uuid("user_id")
-    .notNull()
-    .references(() => users.id),
+export const workspaceMembers = pgTable(
+  "workspace_members",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
 
-  workspaceId: uuid("workspace_id")
-    .notNull()
-    .references(() => workspace.id),
+    memberName: varchar("username", { length: 50 }).notNull(),
 
-  role: varchar("role", { length: 20 }).notNull(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id),
 
-  // assignedBy: varchar('assigned_by') .notNull(),
-  assignedBy: uuid("assigned_by")
-    .notNull()
-    .references(() => users.id),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspace.id),
+
+    role: varchar("role", { length: 20 }).notNull(),
+
+    assignedBy: uuid("assigned_by")
+      .notNull()
+      .references(() => users.id),
+
+    createdAt: timestamp("created_at")
+      .defaultNow()
+      .notNull(),
+  },
+  /* don't assign same user  different role.  Only one role have in workspace  */
+  (table) => ({
+    uniqueUserWorkspace: unique("unique_user_workspace")
+      .on(table.userId, table.workspaceId),
+  })
+);
 
 /* Invitation table */
 
@@ -62,6 +74,7 @@ export const invitations = pgTable("invitations", {
     .references(() => users.id),
   token: varchar("token", { length: 255 }).notNull().unique(),
   status: varchar("status", { length: 20 }).notNull().default("PENDING"),
+  revoke: boolean('revoke').notNull().default(false),
   expiresAt: timestamp("expires_at").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
