@@ -17,56 +17,76 @@ const mg = mailgun.client({
 
 
 // Email sending logic
+// export async function sendEmailNotification(email, subject, html) {
+//   const mailOptions = {
+//     from: `Auth System <mailgun@${process.env.MAILGUN_DOMAIN}>`,
+//     to: [email],
+//     subject: subject,
+//     html: html
+//   };
+
+//   await mg.messages.create(process.env.MAILGUN_DOMAIN, mailOptions);
+//   return true;
+// }
+
 export async function sendEmailNotification(email, subject, html) {
+
   const mailOptions = {
     from: `Auth System <mailgun@${process.env.MAILGUN_DOMAIN}>`,
     to: [email],
-    subject: subject,
-    html: html
+    subject,
+    html,
   };
 
-  await mg.messages.create(process.env.MAILGUN_DOMAIN, mailOptions);
+  const result = await mg.messages.create(
+    process.env.MAILGUN_DOMAIN,
+    mailOptions
+  );
+
+  console.log("Mailgun response:", result);
+
   return true;
 }
-
 // Central token handling service
 export const generateAndSendToken = async (email, type) => {
-  const token = generateSecureToken();
-  const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 Mins
 
-     const result = 
-await db.update(users)
+  const token = generateSecureToken();
+  const hashedToken = hashToken(token);
+
+  const expiresAt = new Date(
+    Date.now() + 15 * 60 * 1000 /* 15 mint */
+  );
+
+  const result = await db
+    .update(users)
     .set({
-        resetToken: hashedToken,
-        tokenExpiresAt: expiresAt,
-        isTokenUsed: false
+      resetToken: hashedToken,
+      tokenExpiresAt: expiresAt,
+      isTokenUsed: false
     })
     .where(eq(users.email, email))
-        .returning({
-            id: users.id,
-            email: users.email,
-            resetToken: users.resetToken,
-            tokenExpiresAt: users.tokenExpiresAt,
-            isTokenUsed: users.isTokenUsed
-        });
+    .returning({
+      id: users.id,
+      email: users.email,
+      resetToken: users.resetToken,
+      tokenExpiresAt: users.tokenExpiresAt,
+      isTokenUsed: users.isTokenUsed
+    });
 
-    console.log("Database updated:", result);
-
+  console.log("Database updated:", result);
 
   let subject;
   let html;
 
-if (type === 'RESET_PASSWORD') {
+  if (type === 'RESET_PASSWORD') {
     subject = 'Reset Your Password';
     html = resetPasswordEmail(token);
-} 
-else if (type === 'EMAIL_VERIFICATION') {
+  } else if (type === 'EMAIL_VERIFICATION') {
     subject = 'Verify Your Email Address';
     html = verificationEmail(token);
-}
- 
+  }
 
-  // Mailgun function call
   await sendEmailNotification(email, subject, html);
+
   return true;
 };

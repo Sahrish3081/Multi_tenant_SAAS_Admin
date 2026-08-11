@@ -14,6 +14,7 @@ import { updateRole } from "#controllers/updateRole.js";
 import { adminMiddleware } from "#middleware/admin.js";
 import { ownerOrAdminMiddleware } from "#middleware/ownerOrAdmin.js";
 import { createInvitation } from "#controllers/invitation.js";
+import { acceptInvitation } from "#controllers/acceptInvitation.js";
 const auth = express.Router();
 
 auth.post('/signup', signup);
@@ -35,4 +36,5 @@ workspace.post("/member-delete/:memberId", authMiddleware, ownerOrAdminMiddlewar
 
 workspace.put("/member-role", authMiddleware, ownerOrAdminMiddleware, updateRole);/* owner or admin role update */
 workspace.post('/invitations',authMiddleware, ownerOrAdminMiddleware,createInvitation);
+workspace.post('/invitations/accept', authMiddleware,acceptInvitation);
 export { auth, workspace };
