@@ -14,7 +14,7 @@ import { updateRole } from "#controllers/updateRole.js";
 import { adminMiddleware } from "#middleware/admin.js";
 import { ownerOrAdminMiddleware } from "#middleware/ownerOrAdmin.js";
 import { createInvitation } from "#controllers/invitation.js";
-import { acceptInvitation } from "#controllers/acceptInvitation.js";
+import { acceptInvitation , revokeInvitation } from "#controllers/acceptInvitation.js";
 import { getMyWorkspace} from "#controllers/getMyWorkspace.js";
 import { getWorkspaceMembers } from  "#controllers/getWorkspaceMembers.js";
 import { changeRole } from "#controllers/changeRole.js";
@@ -41,6 +41,7 @@ workspace.post("/member-delete/:memberId", authMiddleware, ownerOrAdminMiddlewar
 workspace.put("/member-role", authMiddleware, ownerOrAdminMiddleware, updateRole);/* owner or admin role update */
 workspace.post('/invitations',authMiddleware, ownerOrAdminMiddleware,createInvitation);
 workspace.post('/invitations/accept', authMiddleware,acceptInvitation);
+workspace.post('/revoke', revokeInvitation);
 workspace.get('/my-workspaces',authMiddleware,getMyWorkspace);
 workspace.get('/workspace-members/:workspaceId', authMiddleware, getWorkspaceMembers);
 workspace.patch("/change-role/:memberId", authMiddleware,ownerOrAdminMiddleware, changeRole);

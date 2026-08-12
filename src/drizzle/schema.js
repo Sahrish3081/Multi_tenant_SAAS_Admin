@@ -1,4 +1,4 @@
-import {uuid,integer, unique ,pgTable, serial, varchar,timestamp, boolean,} from "drizzle-orm/pg-core";
+import {uuid,integer, unique ,pgTable, serial, varchar,timestamp, boolean, pgEnum,} from "drizzle-orm/pg-core";
 /* User Table */
 export const users = pgTable("users", {
  id: uuid("id").defaultRandom().primaryKey(),
@@ -29,6 +29,9 @@ export const workspace = pgTable("workspaces", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 /* Workspace member table */
+
+export const roleEnum=pgEnum('role',["admin","owner","editor","viewer"]);
+
 export const workspaceMembers = pgTable(
   "workspace_members",
   {
@@ -44,7 +47,7 @@ export const workspaceMembers = pgTable(
       .notNull()
       .references(() => workspace.id),
 
-    role: varchar("role", { length: 20 }).notNull(),
+     role: roleEnum('role').notNull().default('viewer'),
 
     assignedBy: uuid("assigned_by")
       .notNull()

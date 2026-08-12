@@ -1,28 +1,24 @@
+ import { db } from '#config/client.js';
+import { invitations, workspace, workspaceMembers, users } from '#drizzle/schema.js';
+import { eq, and } from 'drizzle-orm';
+import { hashToken } from '#utils/cryptoUtils.js';
 
-import { db } from '#config/client.js';
-import { invitations, workspace, workspaceMembers, users} from '#drizzle/schema.js';
-import { eq, and} from 'drizzle-orm';
-import {generateSecureToken, hashToken} from '#utils/cryptoUtils.js';
-import { invitationEmail } from '#templates/email.js';
-import {sendEmailNotification} from '#services/emailService.js';
-
-/* accept invitation  */
+/* Accept Invitation Controller */
 export const acceptInvitation = async (req, res) => {
   const { token } = req.query;
   const userId = req.user.id;
 
   try {
-  
     if (!token) {
       return res.status(400).json({
         message: "Invitation token is required"
       });
     }
 
-  
+    // Hash the token to match the stored database token
     const hashedToken = hashToken(token);
-
-   /* find invitation */
+    
+    /* Find invitation */
     const [invitation] = await db
       .select()
       .from(invitations)
@@ -33,22 +29,29 @@ export const acceptInvitation = async (req, res) => {
         message: "Invalid invitation token"
       });
     }
+   // Check if the invitation has been explicitly revoked or canceled
+    if (invitation.revoke === true || invitation.status === "REVOKED") {
+      return res.status(400).json({
+        message: "Your invitation has been canceled by the administrator."
+      });
+    }
+   
 
-    //  Check invitation status
+    // Check invitation status (Ensure it is still PENDING)
     if (invitation.status !== "PENDING") {
       return res.status(400).json({
         message: "This invitation has already been accepted or is no longer valid"
       });
     }
 
-    //  Check expiry
+    // Check expiry date
     if (new Date() > invitation.expiresAt) {
       return res.status(400).json({
         message: "This invitation has expired"
       });
     }
 
-    //  Check logged-in user's email
+    // Fetch the logged-in user details
     const [user] = await db
       .select({
         id: users.id,
@@ -64,14 +67,14 @@ export const acceptInvitation = async (req, res) => {
       });
     }
 
-    //  Make sure invitation belongs to this email
+    // Verify token matches logged-in user's email address
     if (user.email.toLowerCase() !== invitation.email.toLowerCase()) {
       return res.status(403).json({
         message: "This invitation was sent to a different email address"
       });
     }
 
-    //  user is already a workspace member
+    // Check if user is already a member of the workspace
     const [existingMember] = await db
       .select({
         id: workspaceMembers.id
@@ -90,16 +93,16 @@ export const acceptInvitation = async (req, res) => {
       });
     }
 
-    // add user to workspace
+    // Add user to the workspace members list
     await db.insert(workspaceMembers).values({
       memberName: user.username,
       userId: userId,
       workspaceId: invitation.workspaceId,
-      role: "member",
+      role: "viewer",
       assignedBy: invitation.invitedBy
     });
 
-    //Mark invitation as accepted
+    // Mark invitation status as ACCEPTED
     await db
       .update(invitations)
       .set({
@@ -110,14 +113,57 @@ export const acceptInvitation = async (req, res) => {
     return res.status(200).json({
       message: "Invitation accepted successfully",
       workspaceId: invitation.workspaceId,
-      role: "member"
+      role: "viewer"
     });
 
   } catch (error) {
-    console.log("Accept Invitation Error:", error);
+    console.error("Accept Invitation Error:", error);
 
     return res.status(500).json({
       message: "Failed to accept invitation",
+      error: error.message
+    });
+  }
+};
+
+/* Revoke Invitation Controller (Admin Actions) */
+export const revokeInvitation = async (req, res) => {
+  const { invitationId } = req.body; // Or req.params depending on route setup
+
+  try {
+    if (!invitationId) {
+      return res.status(400).json({
+        message: "Invitation ID is required to revoke"
+      });
+    }
+
+    // Update the record: Set revoke to true AND status to 'REVOKED'
+    const [updatedInvitation] = await db
+      .update(invitations)
+      .set({
+        revoke: true,
+        status: "REVOKED"
+      })
+      .where(eq(invitations.id, invitationId))
+      .returning(); // Optional: Returns the updated row to confirm
+
+    if (!updatedInvitation) {
+      return res.status(404).json({
+        message: "Invitation not found or could not be updated"
+      });
+    }
+
+    return res.status(200).json({
+      message: "Invitation has been successfully revoked and invalidated.",
+      invitationId: updatedInvitation.id,
+      status: updatedInvitation.status
+    });
+
+  } catch (error) {
+    console.error("Revoke Invitation Error:", error);
+    
+    return res.status(500).json({
+      message: "Failed to revoke invitation",
       error: error.message
     });
   }

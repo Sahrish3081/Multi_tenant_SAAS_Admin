@@ -1,10 +1,10 @@
 import { db } from '#config/client.js';
-import { invitations, workspace } from '#drizzle/schema.js';
-import { eq } from 'drizzle-orm';
+import { users,invitations, workspace , workspaceMembers} from '#drizzle/schema.js';
+import { eq , and } from 'drizzle-orm';
 import {generateSecureToken,hashToken} from '#utils/cryptoUtils.js';
 import { invitationEmail } from '#templates/email.js';
 import { sendEmailNotification } from '#services/emailService.js';
-import { db } from '#config/client.js';
+
 
 export const createInvitation = async (req, res) => {
   const { email, workspaceId } = req.body;
@@ -134,7 +134,8 @@ export const createInvitation = async (req, res) => {
         email: invitation.email,
         workspaceId: invitation.workspaceId,
         status: invitation.status,
-        expiresAt: invitation.expiresAt
+        expiresAt: invitation.expiresAt,
+        token:token
       }
     });
 

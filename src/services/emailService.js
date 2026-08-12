@@ -52,6 +52,7 @@ export const generateAndSendToken = async (email, type) => {
 
   const token = generateSecureToken();
   const hashedToken = hashToken(token);
+  console.log(" TESTING RAW TOKEN (Use this in query params):", token);
 
   const expiresAt = new Date(
     Date.now() + 15 * 60 * 1000 /* 15 mint */

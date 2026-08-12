@@ -20,6 +20,15 @@ export async function changeRole(req, res) {
         message: "Role is required for update role."
       });
     }
+    // your array of allowed roles
+   const allowedRoles = ['admin', 'editor', 'viewer'];
+
+  //  Check if the input role is NOT included in the array
+   if (!allowedRoles.includes(role)) {
+     return res.status(400).json({ 
+    message: `Invalid role assigned. You can only choose from: ${allowedRoles.join(', ')}` 
+  })
+   }
 
     // User cannot change their own role
     const [targetMember] = await db
