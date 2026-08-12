@@ -18,7 +18,7 @@ export async function getWorkspaceMembers(req,res){
      return res.status(200).json({
       message: 'Workspaces fetched successfully',
       count: getWorkspaceMember.length,
-      Members: getWorkspaceMember,
+      member: getWorkspaceMember,
     });
     }
     

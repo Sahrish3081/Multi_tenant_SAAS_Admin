@@ -18,6 +18,8 @@ import { acceptInvitation , revokeInvitation } from "#controllers/acceptInvitati
 import { getMyWorkspace} from "#controllers/getMyWorkspace.js";
 import { getWorkspaceMembers } from  "#controllers/getWorkspaceMembers.js";
 import { changeRole } from "#controllers/changeRole.js";
+import { getMemberOnBaseOfRole } from "#controllers/onBaseOfRole.js";
+import { checkInvitationStatus } from "#controllers/checkStatus.js";
 const auth = express.Router();
 
 auth.post('/signup', signup);
@@ -47,4 +49,6 @@ workspace.get('/workspace-members/:workspaceId', authMiddleware, getWorkspaceMem
 workspace.patch("/change-role/:memberId", authMiddleware,ownerOrAdminMiddleware, changeRole);
 
 workspace.delete( "/member/:memberId", authMiddleware, ownerOrAdminMiddleware, deleteMemberFromWorkspace);
+workspace.get('/role/:role',authMiddleware,ownerMiddleware, getMemberOnBaseOfRole);
+workspace.get('/status/:status', authMiddleware,ownerMiddleware,checkInvitationStatus);
 export { auth, workspace };

@@ -1,7 +1,17 @@
-import {uuid,integer, unique ,pgTable, serial, varchar,timestamp, boolean, pgEnum,} from "drizzle-orm/pg-core";
+import {
+  uuid,
+  integer,
+  unique,
+  pgTable,
+  serial,
+  varchar,
+  timestamp,
+  boolean,
+  pgEnum,
+} from "drizzle-orm/pg-core";
 /* User Table */
 export const users = pgTable("users", {
- id: uuid("id").defaultRandom().primaryKey(),
+  id: uuid("id").defaultRandom().primaryKey(),
   username: varchar("username", { length: 50 }).notNull(),
   email: varchar("email", { length: 100 }).notNull().unique(),
   password: varchar("password", { length: 255 }).notNull(),
@@ -30,7 +40,7 @@ export const workspace = pgTable("workspaces", {
 });
 /* Workspace member table */
 
-export const roleEnum=pgEnum('role',["admin","owner","editor","viewer"]);
+export const roleEnum = pgEnum("role", ["admin", "owner", "editor", "viewer"]);
 
 export const workspaceMembers = pgTable(
   "workspace_members",
@@ -47,27 +57,27 @@ export const workspaceMembers = pgTable(
       .notNull()
       .references(() => workspace.id),
 
-     role: roleEnum('role').notNull().default('viewer'),
+    role: roleEnum("role").notNull().default("viewer"),
 
     assignedBy: uuid("assigned_by")
       .notNull()
       .references(() => users.id),
 
-    createdAt: timestamp("created_at")
-      .defaultNow()
-      .notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   /* don't assign same user  different role.  Only one role have in workspace  */
   (table) => ({
-    uniqueUserWorkspace: unique("unique_user_workspace")
-      .on(table.userId, table.workspaceId),
-  })
+    uniqueUserWorkspace: unique("unique_user_workspace").on(
+      table.userId,
+      table.workspaceId,
+    ),
+  }),
 );
 
 /* Invitation table */
 
 export const invitations = pgTable("invitations", {
- id: uuid("id").defaultRandom().primaryKey(),
+  id: uuid("id").defaultRandom().primaryKey(),
   workspaceId: uuid("workspace_id")
     .notNull()
     .references(() => workspace.id),
@@ -77,7 +87,7 @@ export const invitations = pgTable("invitations", {
     .references(() => users.id),
   token: varchar("token", { length: 255 }).notNull().unique(),
   status: varchar("status", { length: 20 }).notNull().default("PENDING"),
-  revoke: boolean('revoke').notNull().default(false),
+  revoke: boolean("revoke").notNull().default(false),
   expiresAt: timestamp("expires_at").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
