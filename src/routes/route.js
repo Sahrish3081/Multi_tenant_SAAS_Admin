@@ -9,7 +9,7 @@ import {  profileController } from "#controllers/profile.js";
 import { workspaceCreate } from "#controllers/workspace.js";
 //import { workSpaceMembers } from "#controllers/workSpaceMember.js";
 import { ownerMiddleware } from  "#middleware/owner.js";
-import { deleteMemberFromWorkspace } from "#controllers/deleteMembers.js";
+import { deleteMember } from "#controllers/deleteMembers.js";
 import { updateRole } from "#controllers/updateRole.js";
 import { adminMiddleware } from "#middleware/admin.js";
 import { ownerOrAdminMiddleware } from "#middleware/ownerOrAdmin.js";
@@ -38,7 +38,7 @@ workspace.post("/workspace", authMiddleware, workspaceCreate);
 workspace.post("/members", authMiddleware, ownerMiddleware , workSpaceMembers);/* owner add 
 workspace.post("/members", authMiddleware, adminMiddleware, workSpaceMembers);/* admin add */
 
-workspace.post("/member-delete/:memberId", authMiddleware, ownerOrAdminMiddleware,  deleteMemberFromWorkspace);/*admin  or owner delete  */
+workspace.delete("/member-delete/:memberId", authMiddleware, ownerOrAdminMiddleware, deleteMember);/*admin  or owner delete  */
 
 workspace.put("/member-role", authMiddleware, ownerOrAdminMiddleware, updateRole);/* owner or admin role update */
 workspace.post('/invitations',authMiddleware, ownerOrAdminMiddleware,createInvitation);
@@ -47,8 +47,6 @@ workspace.post('/revoke', revokeInvitation);
 workspace.get('/my-workspaces',authMiddleware,getMyWorkspace);
 workspace.get('/workspace-members/:workspaceId', authMiddleware, getWorkspaceMembers);
 workspace.patch("/change-role/:memberId", authMiddleware,ownerOrAdminMiddleware, changeRole);
-
-workspace.delete( "/member/:memberId", authMiddleware, ownerOrAdminMiddleware, deleteMemberFromWorkspace);
 workspace.get('/role/:role',authMiddleware,ownerMiddleware, getMemberOnBaseOfRole);
 workspace.get('/status/:status', authMiddleware,ownerMiddleware,checkInvitationStatus);
 export { auth, workspace };
