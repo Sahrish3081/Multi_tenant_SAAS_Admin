@@ -1,17 +1,27 @@
 import { db } from '#config/client.js';
 import { users } from '#drizzle/schema.js';
 import { eq, and } from 'drizzle-orm';
-
+import { verifiedEmailValidation } from '#validators/authValidation.js'
 export async function verifyEmail(req, res) {
-    try {
-        const { email, token } = req.body;
+    const { email, token } = req.body;
 
         if (!email || !token) {
             return res.status(400).json({
                 error: 'Email and token are required'
             });
         }
-
+       
+          /* throw error in valid form  */
+            const validation = verifiedEmailValidation.safeParse({ email: email });
+            
+            if (!validation.success) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Validation failed",
+                    error: validation.error.flatten().fieldErrors 
+                });
+            }
+    try {
         const user = await db
             .select()
             .from(users)

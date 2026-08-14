@@ -1,7 +1,7 @@
 import { db } from "#config/client.js";
 import { workspace, workspaceMembers, users } from "#drizzle/schema.js";
 import { eq } from "drizzle-orm";
-
+import { workspaceNameValidation } from "#validators/authValidation.js";
 export async function workspaceCreate(req, res) {
   const { workspaceName } = req.body;
 
@@ -9,8 +9,18 @@ export async function workspaceCreate(req, res) {
     return res.status(400).json({
       message: "Workspace name is required",
     });
-  }
+}
+/* apply email validation  */
+const  validation =workspaceNameValidation.safeParse(req.body);
+if (!validation.success) {
+        return res.status(400).json({
+            success: false,
+            message: "Workspace name  Validation failed",
+            errors: validation.error.flatten().fieldErrors 
+        });
+    }
 
+   
   try {
     const createdBy = req.user.id;
 
