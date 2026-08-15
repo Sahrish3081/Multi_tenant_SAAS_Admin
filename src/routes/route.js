@@ -24,6 +24,7 @@ import { getMemberOnBaseOfRole } from "#controllers/onBaseOfRole.js";
 import { checkInvitationStatus } from "#controllers/checkStatus.js";
 import { deleteWorkspace } from "#controllers/deleteWorkspace.js";
 import { updateWorkspace } from "#controllers/updateWorkspace.js";
+import { transferWorkspaceOwnership } from "#controllers/ownershipTransfer.js";
 const auth = express.Router();
 
 auth.post('/signup', signup);
@@ -56,4 +57,6 @@ workspace.get('/role/:role',authMiddleware,ownerMiddleware, getMemberOnBaseOfRol
 workspace.get('/status/:status', authMiddleware,ownerMiddleware,checkInvitationStatus);
 workspace.delete('/delete', authMiddleware,ownerMiddleware, deleteWorkspace);
 workspace.patch('/name-update', authMiddleware, ownerMiddleware, updateWorkspace);
+// Owner ship transfer route
+workspace.post("/:workspaceId/transfer-ownership",authMiddleware, ownerMiddleware,transferWorkspaceOwnership,);
 export { auth, workspace };
