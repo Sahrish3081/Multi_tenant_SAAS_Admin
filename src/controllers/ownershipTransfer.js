@@ -1,4 +1,4 @@
-import { db } from '#config/client.js';
+import { db } from "#config/client.js";
 import { workspace, workspaceMembers } from "#drizzle/schema.js";
 import { eq, and } from "drizzle-orm";
 
@@ -25,9 +25,8 @@ export const transferWorkspaceOwnership = async (req, res) => {
 
   try {
     await db.transaction(async (tx) => {
-      /*
-       * 1. Check workspace
-       */
+      // Check workspace
+
       const [currentWorkspace] = await tx
         .select()
         .from(workspace)
@@ -38,16 +37,14 @@ export const transferWorkspaceOwnership = async (req, res) => {
         throw new Error("WORKSPACE_NOT_FOUND");
       }
 
-      /*
-       * 2. Verify requester is the current workspace owner
-       */
+      //  current workspace owner same id as created
+
       if (currentWorkspace.createdBy !== currentOwnerId) {
         throw new Error("NOT_WORKSPACE_OWNER");
       }
 
-      /*
-       * 3. Find current owner's workspace membership
-       */
+      // Find current owner's workspace membership
+
       const [currentOwnerMember] = await tx
         .select()
         .from(workspaceMembers)
@@ -64,11 +61,8 @@ export const transferWorkspaceOwnership = async (req, res) => {
         throw new Error("OWNER_MEMBERSHIP_NOT_FOUND");
       }
 
-      /*
-       * 4. Find new owner's membership
-       *
-       * According to your project specification,
-       * ownership should be transferred to an existing ADMIN.
+      /*Find new owner's membership
+        ownership should be transferred to an existing ADMIN.
        */
       const [newOwnerMember] = await tx
         .select()
@@ -86,9 +80,7 @@ export const transferWorkspaceOwnership = async (req, res) => {
         throw new Error("NEW_OWNER_MUST_BE_EXISTING_WORKSPACE_ADMIN");
       }
 
-      /*
-       * 5. Old owner becomes admin
-       */
+      /* first owner become admin then admin become owner */
       await tx
         .update(workspaceMembers)
         .set({
@@ -97,9 +89,8 @@ export const transferWorkspaceOwnership = async (req, res) => {
         })
         .where(eq(workspaceMembers.id, currentOwnerMember.id));
 
-      /*
-       * 6. New owner becomes owner
-       */
+      //  New owner becomes owner
+
       await tx
         .update(workspaceMembers)
         .set({
@@ -108,9 +99,8 @@ export const transferWorkspaceOwnership = async (req, res) => {
         })
         .where(eq(workspaceMembers.id, newOwnerMember.id));
 
-      /*
-       * 7. Update workspace.createdBy
-       */
+      //Update workspace.createdBy
+
       await tx
         .update(workspace)
         .set({
