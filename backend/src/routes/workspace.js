@@ -47,6 +47,6 @@ workspace.get( "/:workspaceId/members/:memberId",authMiddleware, ownerOrAdminMid
 workspace.get("/:workspaceId/members/role/:role",authMiddleware,ownerOrAdminMiddleware,getMemberOnBaseOfRole);
 workspace.delete("/member/:memberId", ownerOrAdminMiddleware, deleteMember);
 
-workspace.patch("/member/role/:memberId", ownerOrAdminMiddleware, changeRole);
+workspace.patch("/member/role/:memberId",authMiddleware, ownerOrAdminMiddleware, changeRole);
 
 export default workspace;
