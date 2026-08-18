@@ -4,7 +4,7 @@ import { eq , and } from 'drizzle-orm';
 import {generateSecureToken,hashToken} from '#utils/cryptoUtils.js';
 import { invitationEmail } from '#templates/email.js';
 import { sendEmailNotification } from '#services/emailService.js';
-
+import { createAuditLog } from '#controllers/auditLogs.js';
 
 export const createInvitation = async (req, res) => {
   const { email, workspaceId } = req.body;
@@ -145,6 +145,19 @@ export const createInvitation = async (req, res) => {
     return res.status(500).json({
       message: "Failed to create invitation.",
       error: error.message
+    });
+  }
+  finally{
+     const auditResult = await createAuditLog({
+           performedBy: req.user.id,
+           action: "Send invitation to new member",
+           affectedUser: req.body.workspaceId,
+    });
+    
+    return res.status(200).json({
+      success: true,
+      message: "Send invitation to new member  successfully",
+      audit: auditResult.message,
     });
   }
 };

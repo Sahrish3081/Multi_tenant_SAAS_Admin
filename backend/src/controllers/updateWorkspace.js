@@ -1,7 +1,7 @@
 import { db } from '#config/client.js';
 import { workspace } from '#drizzle/schema.js';
 import { eq } from 'drizzle-orm';
-
+import { createAuditLog } from '#controllers/auditLogs.js';
 export async function updateWorkspace(req, res) {
   const userId = req.user.id;
   const { workspaceId } = req.body;
@@ -37,4 +37,16 @@ export async function updateWorkspace(req, res) {
       error: error.message,
     });
   }
+  finally{
+      const auditResult=await createAuditLog({
+             performedBy: req.user.id,
+             action: "Update workspace",
+             affectedUser: req.body.workspaceId,
+      });
+      return res.status(200).json({
+        success: true,
+        message: "Update workspace successfully",
+        audit: auditResult.message,
+      });
+    }
 }

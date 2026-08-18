@@ -1,7 +1,7 @@
 import { db } from '#config/client.js';
 import { workspaceMembers } from '#drizzle/schema.js';
 import { eq } from 'drizzle-orm';
-
+import { createAuditLog } from '#controllers/auditLogs.js';
 
 export async function changeRole(req, res) {
   const memberId = req.params.memberId;
@@ -84,5 +84,18 @@ export async function changeRole(req, res) {
       message: "Failed to update role.",
       error: error.message
     });
+  }
+  finally{
+       const auditResult = await createAuditLog({
+       performedBy: req.user.id,
+       action: "Role Update",
+       affectedUser: req.params.memberId,
+});
+
+return res.status(200).json({
+  success: true,
+  message: "Role update successfully",
+  audit: auditResult.message,
+});
   }
 }

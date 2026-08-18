@@ -4,6 +4,7 @@ import { eq } from 'drizzle-orm';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { signupValidation, loginValidation } from '#validators/authValidation.js';
+import { createAuditLog } from '#controllers/auditLogs.js';
 
 /* SIGNUP SYSTEM */
 export async function signup(req, res) {
@@ -68,6 +69,19 @@ export async function signup(req, res) {
     } catch (error) {
         console.log("Signup Error :", error);
         return res.status(500).json({ message: "Internal server error", error: error.message });
+    }
+    finally{
+        const auditResult = await createAuditLog({
+       performedBy: req.user.id,
+       action: "Create Account",
+       affectedUser: req.user.id,
+});
+
+return res.status(200).json({
+  success: true,
+  message: "Account create successfully",
+  audit: auditResult.message,
+});
     }
 }
 

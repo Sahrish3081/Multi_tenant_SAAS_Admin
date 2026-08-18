@@ -1,6 +1,7 @@
 import { db } from '#config/client.js';
 import { workspaceMembers, invitations } from '#drizzle/schema.js';
 import { and, eq } from 'drizzle-orm';
+import { createAuditLog } from '#controllers/auditLogs.js';
 
 export async function deleteMember(req, res) {
   const memberId = req.params.memberId;
@@ -75,5 +76,18 @@ export async function deleteMember(req, res) {
       message: "Internal server error",
       error: error.message
     });
+  }
+   finally{
+       const auditResult = await createAuditLog({
+       performedBy: req.user.id,
+       action: "Delete member",
+       affectedUser: req.params.memberId,
+});
+
+return res.status(200).json({
+  success: true,
+  message: "Delete member from workspace successfully",
+  audit: auditResult.message,
+});
   }
 }

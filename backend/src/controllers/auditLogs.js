@@ -1,6 +1,6 @@
 import { db } from "#config/client.js";
 import { audit_log } from "#drizzle/schema.js";
-export const createAuditLog = async ({performedBy,action,affectedUser,}) => {
+export const createAuditLog = async ({ performedBy, action, affectedUser }) => {
   try {
     await db.insert(audit_log).values({
       performedBy,

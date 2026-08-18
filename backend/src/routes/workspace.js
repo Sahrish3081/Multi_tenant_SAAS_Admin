@@ -41,46 +41,10 @@ workspace.post(
 //   /members?workspaceId=123&memberId=456
 //   /members?workspaceId=123&role=admin
 
-workspace.get("/members", (req, res, next) => {
-  const { workspaceId, memberId, role } = req.query;
+workspace.get( "/:workspaceId/members/:memberId",authMiddleware, ownerOrAdminMiddleware,  getWorkspaceMembers
+);
 
-  if (!workspaceId && !memberId && !role) {
-    return getMyWorkspace(req, res);
-
-    if (workspaceId && memberId && role) {
-      req.params.workspaceId = workspaceId;
-      req.params.memberId = memberId;
-      req.params.role = role;
-
-      return getWorkspaceMembers(req, res);
-    }
-
-    if (workspaceId && memberId) {
-      req.params.workspaceId = workspaceId;
-      req.params.memberId = memberId;
-
-      return getWorkspaceMembers(req, res);
-    }
-
-    if (workspaceId && role) {
-      req.body.workspaceId = workspaceId;
-      req.params.role = role;
-
-      return getMemberOnBaseOfRole(req, res);
-    }
-
-    if (workspaceId) {
-      req.params.workspaceId = workspaceId;
-
-      return getWorkspaceMembers(req, res);
-    }
-
-    return res.status(400).json({
-      message: "Invalid query parameters",
-    });
-  }
-});
-
+workspace.get("/:workspaceId/members/role/:role",authMiddleware,ownerOrAdminMiddleware,getMemberOnBaseOfRole);
 workspace.delete("/member/:memberId", ownerOrAdminMiddleware, deleteMember);
 
 workspace.patch("/member/role/:memberId", ownerOrAdminMiddleware, changeRole);

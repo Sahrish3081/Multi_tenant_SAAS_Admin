@@ -1,7 +1,7 @@
 import { db } from "#config/client.js";
 import { workspace, workspaceMembers } from "#drizzle/schema.js";
 import { eq, and } from "drizzle-orm";
-
+import { createAuditLog } from '#controllers/auditLogs.js';
 export const transferWorkspaceOwnership = async (req, res) => {
   const { workspaceId } = req.params;
   const { newOwnerId } = req.body;
@@ -153,5 +153,17 @@ export const transferWorkspaceOwnership = async (req, res) => {
           message: "Failed to transfer workspace ownership",
         });
     }
+  }
+  finally{
+    const auditResult=await createAuditLog({
+           performedBy: req.user.id,
+           action: "Transfer ownership to admin",
+           affectedUser: req.body.newOwnerId,
+    });
+    return res.status(200).json({
+      success: true,
+      message: "Transfer ownership  successfully",
+      audit: auditResult.message,
+    });
   }
 };

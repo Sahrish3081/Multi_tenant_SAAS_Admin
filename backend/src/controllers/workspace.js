@@ -2,6 +2,8 @@ import { db } from "#config/client.js";
 import { workspace, workspaceMembers, users } from "#drizzle/schema.js";
 import { eq } from "drizzle-orm";
 import { workspaceNameValidation } from "#validators/authValidation.js";
+import { createAuditLog } from '#controllers/auditLogs.js';
+import { id } from "zod/v4/locales";
 export async function workspaceCreate(req, res) {
   const { workspaceName } = req.body;
 
@@ -72,7 +74,16 @@ if (!validation.success) {
       error: error.message,
     });
   }
+  finally {
+    const auditResult=await createAuditLog({
+             performedBy: req.user.id,
+             action: "Create workspace",
+             affectedUser: ' ',
+      });
+      return res.status(200).json({
+        success: true,
+        message: "Create workspace successfully",
+        audit: auditResult.message,
+      });
+  }
 }
-
-/* workspace id : 7e4038c1-694c-40f1-bca0-08d0a61c342f devsapce ki owner sahrish */
-// workspace id marketing team onwer sahrish 3a15fbf4-005b-49d3-8937-4dedc6dd8f70
