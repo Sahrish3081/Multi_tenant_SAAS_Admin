@@ -2,7 +2,7 @@ import { db } from "#config/client.js";
 import { workspace, workspaceMembers, users } from "#drizzle/schema.js";
 import { eq } from "drizzle-orm";
 import { workspaceNameValidation } from "#validators/authValidation.js";
-import { createAuditLog } from '#controllers/auditLogs.js';
+import { createAuditLog } from "#controllers/auditLogs.js";
 import { id } from "zod/v4/locales";
 export async function workspaceCreate(req, res) {
   const { workspaceName } = req.body;
@@ -11,26 +11,24 @@ export async function workspaceCreate(req, res) {
     return res.status(400).json({
       message: "Workspace name is required",
     });
-}
-/* apply email validation  */
-const  validation =workspaceNameValidation.safeParse(req.body);
-if (!validation.success) {
-        return res.status(400).json({
-            success: false,
-            message: "Workspace name  Validation failed",
-            errors: validation.error.flatten().fieldErrors 
-        });
-    }
+  }
+  /* apply email validation  */
+  const validation = workspaceNameValidation.safeParse(req.body);
+  if (!validation.success) {
+    return res.status(400).json({
+      success: false,
+      message: "Workspace name  Validation failed",
+      errors: validation.error.flatten().fieldErrors,
+    });
+  }
 
-   
+  const createdBy = req.user.id;
   try {
-    const createdBy = req.user.id;
-
     // Get creator's username
     const user = await db
       .select({
         id: users.id,
-        username: users.username,
+        name: users.name,
       })
       .from(users)
       .where(eq(users.id, createdBy));
@@ -54,7 +52,7 @@ if (!validation.success) {
 
     // Creator automatically becomes Owner
     await db.insert(workspaceMembers).values({
-      memberName: user[0].username,
+      memberName: user[0].name,
       userId: createdBy,
       workspaceId: newWorkspace.id,
       role: "owner",
@@ -73,17 +71,24 @@ if (!validation.success) {
       message: "Internal server error",
       error: error.message,
     });
-  }
-  finally {
-    const auditResult=await createAuditLog({
-             performedBy: req.user.id,
-             action: "Create workspace",
-             affectedUser: ' ',
-      });
-      return res.status(200).json({
-        success: true,
-        message: "Create workspace successfully",
-        audit: auditResult.message,
-      });
+  } finally {
+    try
+    {
+
+    const auditResult = await createAuditLog({
+      performedBy: createdBy,
+      action: "Create workspace",
+      affectedUser: null,
+    });
+    //console.log(`auditResult `, auditResult)
+    return res.status(200).json({
+      success: true,
+      message: "Transfer ownership  successfully",
+      audit: auditResult.message,
+    });
+    }
+    catch (error) {
+      console.log("finally block error: ", error)
+    }
   }
 }

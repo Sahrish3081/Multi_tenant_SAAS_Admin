@@ -1,23 +1,22 @@
 import { db } from "#config/client.js";
-import { audit_log } from "#drizzle/schema.js";
-export const createAuditLog = async ({ performedBy, action, affectedUser }) => {
+import { auditLog } from "#drizzle/schema.js";
+export const createAuditLog = async ({ performedBy, action, affectedUser,}) => {
   try {
-    await db.insert(audit_log).values({
-      performedBy,
-      action,
-      affectedUser,
-    });
+    const result = await db
+      .insert(auditLog)
+      .values({
+        performedBy,
+        action,
+        affectedUser,
+      })
+      .returning();
 
-    return {
-      success: true,
-      message: "Audit log created successfully",
-    };
+    console.log("Audit log inserted:", result);
+
+    return result;
+
   } catch (error) {
     console.error("Audit log error:", error);
-
-    return {
-      success: false,
-      message: "Failed to create audit log",
-    };
+    throw error;
   }
 };

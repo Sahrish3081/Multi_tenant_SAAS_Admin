@@ -71,10 +71,17 @@ export async function changeRole(req, res) {
         workspaceId: workspaceMembers.workspaceId,
         role: workspaceMembers.role
       });
+         // Create audit log ONLY after successful update
+    const auditResult = await createAuditLog({
+      performedBy: userId,
+      action: "Role Update",
+      affectedUser: targetMember.userId,
+    });
 
     return res.status(200).json({
       message: "Member role updated successfully",
-      member: updateMember
+      member: updateMember,
+      audit: auditResult
     });
 
   } catch (error) {
@@ -84,18 +91,5 @@ export async function changeRole(req, res) {
       message: "Failed to update role.",
       error: error.message
     });
-  }
-  finally{
-       const auditResult = await createAuditLog({
-       performedBy: req.user.id,
-       action: "Role Update",
-       affectedUser: req.params.memberId,
-});
-
-return res.status(200).json({
-  success: true,
-  message: "Role update successfully",
-  audit: auditResult.message,
-});
   }
 }

@@ -156,7 +156,7 @@ export const transferWorkspaceOwnership = async (req, res) => {
   }
   finally{
     const auditResult=await createAuditLog({
-           performedBy: req.user.id,
+           performedBy:currentOwnerId, 
            action: "Transfer ownership to admin",
            affectedUser: req.body.newOwnerId,
     });

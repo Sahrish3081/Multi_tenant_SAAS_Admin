@@ -6,7 +6,7 @@ import { and, eq, inArray } from "drizzle-orm";
 export async function ownerOrAdminMiddleware(req, res, next) {
   try {
   const userId = req.user.id;
-  const workspaceId = req.body.workspaceId;
+const workspaceId =req.params.workspaceId || req.body.workspaceId || req.query.workspaceId;
 
     if (!workspaceId) {
       return res.status(400).json({

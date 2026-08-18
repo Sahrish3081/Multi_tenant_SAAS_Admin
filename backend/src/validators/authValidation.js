@@ -46,7 +46,7 @@ export const loginValidation = z.object({
 
 export const signupValidation = withConfirmPassword(
   z.object({
-    username: z.string().trim().min(3).max(50),
+    name: z.string().trim().min(3).max(50),
     email: emailSchema,
     password: passwordSchema,
   })

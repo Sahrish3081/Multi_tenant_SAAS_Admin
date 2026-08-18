@@ -5,7 +5,7 @@ import { createAuditLog } from '#controllers/auditLogs.js';
 export async function updateWorkspace(req, res) {
   const userId = req.user.id;
   const { workspaceId } = req.body;
-  const workspaceName = req.body.workspace_name;
+  const workspaceName = req.body.workspaceName;
 
   try {
     // Check if workspace exists
@@ -38,15 +38,14 @@ export async function updateWorkspace(req, res) {
     });
   }
   finally{
-      const auditResult=await createAuditLog({
-             performedBy: req.user.id,
-             action: "Update workspace",
-             affectedUser: req.body.workspaceId,
+     try {
+      await createAuditLog({
+         performedBy: userId,
+         action: "Update workspace",
+         affectedUser: null,
       });
-      return res.status(200).json({
-        success: true,
-        message: "Update workspace successfully",
-        audit: auditResult.message,
-      });
+   } catch (auditError) {
+      console.error("Audit log failed:", auditError);
+   }
     }
 }

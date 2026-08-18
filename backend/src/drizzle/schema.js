@@ -6,7 +6,7 @@ export const users = pgTable(
   "users",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    username: varchar("username", { length: 50 }).notNull(),
+    name: varchar("name", { length: 50 }).notNull(),
     email: varchar("email", { length: 100 }).notNull(),
 
     password: varchar("password", { length: 255 }).notNull(),
@@ -23,10 +23,9 @@ export const users = pgTable(
   (table) => {
     return {
       // 2.  unique index apply
-      emailUniqueIdx: uniqueIndex("users_email_unique_idx").on(table.email),
-      usernameUniqueIdx: uniqueIndex("users_username_unique_idx").on(
-        table.username,
-      ),
+      emailUniqueIdx: uniqueIndex("users_email_unique_idx").on(table.email)
+  
+
     };
   },
 );
@@ -129,14 +128,13 @@ createdAt: timestamp("created_at").defaultNow().notNull(),
   },
 );
 
-export const audit_log=pgTable("auditLog",{
+export const auditLog=pgTable("auditLog",{
   id:uuid("id").defaultRandom().primaryKey(),
-  preformedBy:uuid("preformed_by").notNull().references(() => users.id),
+  performedBy:uuid("performed_by").notNull(),
   // What action was performed
   action: varchar("action", { length: 100 }).notNull(),
  // Whom / what was affected
-  affectedUser: uuid("affected_user")
-    .references(() => users.id),
+  affectedUser: uuid("affected_user"),
   // When the action happened
   createdAt: timestamp("created_at") .defaultNow() .notNull(),
 });

@@ -43,7 +43,7 @@ export async function signup(req, res) {
     }
 
     
-    const { username, email, password } = validation.data;
+    const { name, email, password } = validation.data;
 
     try {
         const emailExists = await db.select().from(users).where(eq(users.email, email));
@@ -58,30 +58,26 @@ export async function signup(req, res) {
         const hashedPassword = await bcrypt.hash(password, 10);
         
         /* insert data in database */
-        await db.insert(users).values({
-            username: username,
+        const [newUser]=await db.insert(users).values({
+            name: name,
             email: email,
             password: hashedPassword
-        });
+        })
+    .returning({
+        id: users.id
+    });
+    /* activity history  */
+    const auditResult = await createAuditLog({
+       performedBy: newUser.id,
+       action: "Create Account",
+      affectedUser: newUser.id,
+});
 
         /* successful request confirmation */
         return res.status(201).json({ message: "Signup successful" });
     } catch (error) {
         console.log("Signup Error :", error);
         return res.status(500).json({ message: "Internal server error", error: error.message });
-    }
-    finally{
-        const auditResult = await createAuditLog({
-       performedBy: req.user.id,
-       action: "Create Account",
-       affectedUser: req.user.id,
-});
-
-return res.status(200).json({
-  success: true,
-  message: "Account create successfully",
-  audit: auditResult.message,
-});
     }
 }
 
@@ -143,7 +139,7 @@ export async function login(req, res) {
 
         if (!validPassword) {
             return res.status(401).json({
-                message: "Invalid password"
+                message: "Invalid email and password"
             });
         }
 

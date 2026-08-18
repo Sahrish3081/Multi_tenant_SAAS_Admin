@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 export function authMiddleware(req, res, next) {
     try {
         // Authorization header get karo
-        const authHeader = req.headers.authorization;
+        const authHeader = req?.headers?.authorization;
 
         // Check karo header exist karta hai ya nahi
         if (!authHeader) {
