@@ -94,19 +94,12 @@ export const invitations = pgTable(
 
     email: varchar("email", { length: 100 }).notNull(),
 
-    invitedBy: uuid("invited_by")
-      .notNull()
-      .references(() => users.id),
-
+    invitedBy: uuid("invited_by").notNull().references(() => users.id),
     token: varchar("token", { length: 255 }).notNull(), // Removed inline .unique() to use explicit index below
-
-    status: varchar("status", { length: 20 }).notNull().default("PENDING"),
-
-    revoke: boolean("revoke").notNull().default(false),
-
-    expiresAt: timestamp("expires_at").notNull(),
-
-    createdAt: timestamp("created_at").defaultNow().notNull(),
+   status: varchar("status", { length: 20 }).notNull().default("PENDING"),
+   revoke: boolean("revoke").notNull().default(false),
+ expiresAt: timestamp("expires_at").notNull(),
+createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => {
     return {
@@ -135,3 +128,15 @@ export const invitations = pgTable(
     };
   },
 );
+
+export const audit_log=pgTable("auditLog",{
+  id:uuid("id").defaultRandom().primaryKey(),
+  preformedBy:uuid("preformed_by").notNull().references(() => users.id),
+  // What action was performed
+  action: varchar("action", { length: 100 }).notNull(),
+ // Whom / what was affected
+  affectedUser: uuid("affected_user")
+    .references(() => users.id),
+  // When the action happened
+  createdAt: timestamp("created_at") .defaultNow() .notNull(),
+});
