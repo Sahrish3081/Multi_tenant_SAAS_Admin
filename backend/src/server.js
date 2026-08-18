@@ -1,8 +1,7 @@
 import express from "express";
 import "dotenv/config";
 import dotenv from "dotenv";
-
-import { auth, workspace } from "#routes/route.js";
+import router  from "#routes/route.js";
 
 dotenv.config();
 
@@ -10,8 +9,7 @@ const app = express();
 
 app.use(express.json());
 
-app.use("/api/v1/auth", auth);
-app.use("/api/v1/workspace", workspace);
+app.use("/api/v1/", router);
 
 const PORT = process.env.PORT || 3000;
 
