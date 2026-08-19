@@ -46,7 +46,14 @@ export const loginValidation = z.object({
 
 export const signupValidation = withConfirmPassword(
   z.object({
-    name: z.string().trim().min(3).max(50),
+    name: z.string({ required_error: "Name is required" })
+  .trim()
+  .min(3, "Name must be at least 3 characters.")
+  .max(50, "Name cannot be longer than 50 characters.")
+  .regex(
+    /^[A-Za-z]+(?:[ '-][A-Za-z]+)*$/,
+    "Name can contain only letters, spaces, hyphens, and apostrophes."
+  ),
     email: emailSchema,
     password: passwordSchema,
   })
