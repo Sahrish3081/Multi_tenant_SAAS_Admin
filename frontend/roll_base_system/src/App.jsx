@@ -3,7 +3,9 @@ import "./App.css";
 
 import Index from "./pages/Index.jsx";
 import Signup from "./pages/Signup.jsx";
-import LoginCard from "./assets/components/LoginCard.jsx";
+import Login from "./pages/Login.jsx";
+import  ProtectedRoute  from "./assets/components/ProtectedRoute.jsx"
+import Dashboard from "./pages/Dashboard.jsx";
 
 function App() {
   return (
@@ -11,7 +13,8 @@ function App() {
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/login" element={<LoginCard/>}/>
+        <Route path="/login" element={<Login/>}/>
+        <Route path="/dashboard" element={<ProtectedRoute> <Dashboard/></ProtectedRoute> }/>
       </Routes>
     </BrowserRouter>
   );
