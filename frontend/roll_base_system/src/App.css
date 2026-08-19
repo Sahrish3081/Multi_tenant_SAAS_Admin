@@ -1,1 +1,66 @@
 @import "tailwindcss";
+:root {
+  /* Base / neutral scale */
+  --color-bg: #F9FAFB;
+  --color-surface: #f7eeee;
+  --color-surface-alt: #F3F4F6;
+  --color-border: #E5E7EB;
+  --color-border-strong: #D1D5DB;
+
+  --color-text-primary: #111827;
+  --color-text-secondary: #6B7280;
+  --color-text-muted: #9CA3AF;
+
+  /* Primary accent (actions, links, focus rings) */
+  --color-primary: #4F46E5;
+  --color-primary-hover: #4338CA;
+  --color-primary-light: #EEF2FF;
+  --color-primary-text: #4338CA;
+
+  /* Status colors */
+  --color-success: #16A34A;
+  --color-success-bg: #F0FDF4;
+  --color-success-border: #BBF7D0;
+
+  --color-warning: #D97706;
+  --color-warning-bg: #FFFBEB;
+  --color-warning-border: #FDE68A;
+
+  --color-danger: #DC2626;
+  --color-danger-bg: #FEF2F2;
+  --color-danger-border: #FECACA;
+
+  --color-inherited: #6B7280;
+  --color-inherited-bg: #F3F4F6;
+  --color-inherited-border: #E5E7EB;
+
+  /* Role badge colors (org roles) */
+  --color-role-owner: #7C3AED;
+  --color-role-owner-bg: #F5F3FF;
+
+  --color-role-admin: #4F46E5;
+  --color-role-admin-bg: #EEF2FF;
+
+  --color-role-member: #6B7280;
+  --color-role-member-bg: #F3F4F6;
+
+  /* Role badge colors (workspace roles) */
+  --color-role-editor: #0891B2;
+  --color-role-editor-bg: #ECFEFF;
+
+  --color-role-viewer: #64748B;
+  --color-role-viewer-bg: #F1F5F9;
+}
+/* button class */
+.btn-primary {
+  background-color: var(--color-primary);
+  color: white;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  transition: background-color 150ms ease;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-hover);
+}

@@ -1,12 +1,12 @@
 
 import './App.css'
-
+import  Index from "./pages/Index.jsx";
 function App() {
  
 
   return (
    <>
-   <h1>Roll Base System</h1>
+<Index/>
    </>
   )
 }
