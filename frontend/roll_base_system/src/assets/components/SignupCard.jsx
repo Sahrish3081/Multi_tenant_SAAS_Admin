@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { useState } from "react";
 
-export default function Signup() {
+export default function SignupCard() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
