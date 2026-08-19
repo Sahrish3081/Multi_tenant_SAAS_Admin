@@ -14,6 +14,7 @@ export default function SignupCard() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [message, setMessage] = useState("");
+
   /* save the change values */
   function handleChange(event) {
     const { name, value } = event.target;
@@ -22,48 +23,60 @@ export default function SignupCard() {
       [name]: value,
     }));
   }
+async function handleSubmit(event) {
+  event.preventDefault();
 
-  async function handleSubmit(event) {
-    event.preventDefault();
 
-    if (formData.password !== formData.confirmPassword) {
-      setMessage("Passwords do not match.");
-      return;
-    }
 
-    try {
-      const response = await fetch("http://localhost:3000/api/v1/auth/signup", {
+  if (formData.password !== formData.confirmPassword) {
+       setMessage("Password doesn't match.  ");
+           return;
+  }
+
+  try {
+    const response = await fetch(
+      "http://localhost:3000/api/v1/auth/signup",
+      {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      console.log("Status:", response.status);
-      console.log("Data:", data);
-
-      if (!response.ok) {
-        setMessage(data.message || "Signup failed.");
-        return;
       }
+    );
 
-      setMessage("Account created successfully!");
+    const data = await response.json();
 
-      // Optional: clear form after successful signup
-      setFormData({
-        name: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-      });
-    } catch (error) {
-      console.log("Signup error:", error);
-      setMessage("Something went wrong. Please try again.");
-    }
+    console.log("Status:", response.status);
+    console.log("Data:", data);
+
+   if (!response.ok) {
+  if (data.errors) {
+    const errorMessages = Object.values(data.errors).flat();
+
+    setMessage(errorMessages.join(" "));
+  } else if (data.message) {
+    setMessage(data.message);
+  } else {
+    setMessage("Signup failed. Please try again.");
   }
+
+  return;
+}
+
+    setMessage("Account created successfully!");
+
+    setFormData({
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    });
+  } catch (error) {
+    console.log("Signup error:", error);
+    setMessage("Something went wrong. Please try again.");
+  }
+}
   return (
     <div className="w-[420px] rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-sm">
       <p className="mb-1 text-sm font-medium text-[var(--color-primary)]">
