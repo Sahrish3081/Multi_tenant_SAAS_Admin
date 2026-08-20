@@ -17,7 +17,7 @@ auth.post("/login", login);
 auth.post("/forget-password", forgetPassword);
 auth.post("/reset-password", resetPassword);
 auth.post("/email-verification-token", emailVerification);
-auth.post("/verify-Email", verifyEmail);
+auth.get("/verify-Email", verifyEmail);
 
 auth.patch("/change-password", authMiddleware, changePassword);
 

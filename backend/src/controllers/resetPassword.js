@@ -5,7 +5,8 @@ import { eq } from 'drizzle-orm';
 import bcrypt from 'bcrypt';
 
 export async function resetPassword(req, res) {
-    const { token, new_password, confirm_password } = req.body;
+    const token=req.query;
+    const { new_password, confirm_password } = req.body;
 
     // Validate input
     if (!token || !new_password || !confirm_password) {

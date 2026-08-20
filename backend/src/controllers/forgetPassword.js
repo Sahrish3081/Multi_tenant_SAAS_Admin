@@ -12,13 +12,13 @@ export async function forgetPassword(req, res) {
             return res.status(400).json({ error: 'Email is required' });
         }
 
-        // Check karein ke user exist karta hai ya nahi
+        // Check user exist or not
         const userEmail = await db.select().from(users).where(eq(users.email, email));
         if (userEmail.length === 0) {
             return res.status(404).json({ error: "User email not found" });
         }
 
-        // Service layer ko call kiya jo token generate karegi aur database update karegi
+        // Service layer call  generate token function and email send to user
        await generateAndSendToken(email, 'RESET_PASSWORD');
 
         return res.status(200).json({ message: 'Password reset token sent to your email.' });
