@@ -1,74 +1,68 @@
 import { db } from '#config/client.js';
 import { users } from '#drizzle/schema.js';
 import { eq, and } from 'drizzle-orm';
-import { verifiedEmailValidation } from '#validators/authValidation.js'
+import { verifiedEmailValidation } from '#validators/authValidation.js';
+import  { hashToken } from  "#utils/cryptoUtils.js";
+
 export async function verifyEmail(req, res) {
-    const { email, token } = req.body;
+  const { token } = req.query;
 
-        if (!email || !token) {
-            return res.status(400).json({
-                error: 'Email and token are required'
-            });
-        }
-       
-          /* throw error in valid form  */
-            const validation = verifiedEmailValidation.safeParse({ email: email });
-            
-            if (!validation.success) {
-                return res.status(400).json({
-                    success: false,
-                    message: "Validation failed",
-                    error: validation.error.flatten().fieldErrors 
-                });
-            }
-    try {
-        const user = await db
-            .select()
-            .from(users)
-            .where(
-                and(
-                    eq(users.email, email),
-                    eq(users.resetToken, token)
-                )
-            );
+  if (!token) {
+    return res.status(400).json({
+      success: false,
+      message: "Verification token is required.",
+    });
+  }
 
-        if (user.length === 0) {
-            return res.status(400).json({
-                error: 'Invalid verification token'
-            });
-        }
+  try {
+    const hashedToken = hashToken(token);
 
-        if (user[0].tokenExpiresAt < new Date()) {
-            return res.status(400).json({
-                error: 'Verification token has expired'
-            });
-        }
+    const user = await db
+      .select()
+      .from(users)
+      .where(eq(users.resetToken, hashedToken));
 
-        if (user[0].isTokenUsed) {
-            return res.status(400).json({
-                error: 'Verification token has already been used'
-            });
-        }
-
-        await db
-            .update(users)
-            .set({
-                isEmailVerified: true,
-                isTokenUsed: true,
-                resetToken: null,
-                tokenExpiresAt: null
-            })
-            .where(eq(users.email, email));
-
-        return res.status(200).json({
-            message: 'Email verified successfully'
-        });
-
-    } catch (error) {
-        console.error('Email Verification Error:', error);
-
-        return res.status(500).json({
-            error: 'Internal server error'
-        });
+    if (user.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid verification token.",
+      });
     }
+
+    if (user[0].tokenExpiresAt < new Date()) {
+      return res.status(400).json({
+        success: false,
+        message: "Verification token has expired.",
+      });
+    }
+
+    if (user[0].isTokenUsed) {
+      return res.status(400).json({
+        success: false,
+        message: "Verification token has already been used.",
+      });
+    }
+
+    await db
+      .update(users)
+      .set({
+        isEmailVerified: true,
+        isTokenUsed: true,
+        resetToken: null,
+        tokenExpiresAt: null,
+      })
+      .where(eq(users.id, user[0].id));
+
+    return res.status(200).json({
+      success: true,
+      message: "Email verified successfully.",
+    });
+  } catch (error) {
+    console.error("Email Verification Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error.",
+    });
+  }
 }

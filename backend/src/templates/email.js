@@ -31,9 +31,7 @@ export function resetPasswordEmail(token) {
                 This link will expire in <strong>15 minutes</strong>.
             </p>
 
-            <p style="color:#777777;font-size:14px;line-height:1.5;">
-                If you did not request a password reset, you can safely ignore this email.
-            </p>
+    
 
             <hr style="border:none;border-top:1px solid #eeeeee;margin:30px 0;">
 
@@ -69,7 +67,7 @@ export function verificationEmail(token) {
 
                     <a href="${verificationLink}" target="_blank"
                        style="display:inline-block;padding:14px 28px;background-color:#4f46e5;color:#ffffff;text-decoration:none;border-radius:8px;font-size:16px;font-weight:bold;">
-                        vERIFY EMAIL
+                        VERIFY EMAIL
                     </a>
 
                 </div>
@@ -78,9 +76,6 @@ export function verificationEmail(token) {
                 This link will expire in <strong>15 minutes</strong>.
             </p>
 
-            <p style="color:#777777;font-size:14px;line-height:1.5;">
-                If you did not create an account, you can safely ignore this email.
-            </p>
 
             <hr style="border:none;border-top:1px solid #eeeeee;margin:30px 0;">
 
