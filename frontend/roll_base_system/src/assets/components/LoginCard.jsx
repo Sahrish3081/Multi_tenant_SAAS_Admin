@@ -3,14 +3,14 @@ import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useNavigate } from "react-router-dom";
 export default function LoginCard() {
-
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [message , setMessage]=useState("");
+  const [message, setMessage] = useState("");
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   function handleChange(event) {
     const { name, value } = event.target;
     setFormData((prevData) => ({
@@ -20,113 +20,259 @@ export default function LoginCard() {
   }
   async function handleSubmit(event) {
     event.preventDefault();
-      if (!formData.email || !formData.password) {
+    if (!formData.email || !formData.password) {
       setMessage("All fields are required.");
       return;
     }
-      
-    try {
-         const response= await fetch("http://localhost:3000/api/v1/auth/login",
-           {
-             method:"POST",
-             headers:{
-                "Content-Type":"application/json",
-             },
-             body:JSON.stringify(formData),
-           });
-           const data=await response.json();
-        
-   if (!response.ok) {
-  if (data.errors) {
-    const errorMessages = Object.values(data.errors).flat();
 
-    setMessage(errorMessages.join(" "));
-  } else if (data.message) {
-    setMessage(data.message);
-  } else {
-    setMessage("Login failed. Please try again.");
+    try {
+      const response = await fetch("http://localhost:3000/api/v1/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (data.errors) {
+          const errorMessages = Object.values(data.errors).flat();
+
+          setMessage(errorMessages.join(" "));
+        } else if (data.message) {
+          setMessage(data.message);
+        } else {
+          setMessage("Login failed. Please try again.");
+        }
+
+        return;
+      }
+      /* Save JWT token for valid user */
+      localStorage.setItem("token", data.token);
+      setMessage("Login successful!");
+      navigate("/dashboard", { replace: true });
+      // Optional: clear form after successful signup
+      setFormData({
+        email: "",
+        password: "",
+      });
+    } catch (error) {
+      setMessage("Login error:", error);
+    }
   }
 
-  return;
-   }
-   /* Save JWT token for valid user */
-     localStorage.setItem("token", data.token);
-    setMessage("Login successful!");
-    navigate("/dashboard");
-         // Optional: clear form after successful signup
-      setFormData({
-       email: "",
-       password: ""});
+  async function handleForgotPassword(event) {
+    event.preventDefault();
+    setLoading(true);
+    setMessage("");
+    if (!formData.email) {
+      setMessage("Email is  required.");
+      return;
+    }
+    try {
+      const response = await fetch(
+        "http://localhost:3000/api/v1/auth/forget-password",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        },
+      );
+      const data = await response.json();
+      console.log(data);
+      if (response.ok) {
+        setMessage("Reset link sent to your email!");
+      } else {
+        setMessage(data.message || "Something went wrong.");
+      }
     } catch (error) {
-
-     setMessage("Login error:", error);
+      setMessage("Network error. Please try again.", error);
+    } finally {
+      setLoading(false);
     }
   }
 
   return (
-    <div className="w-[420px] rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-sm">
-      <p className="text-[#7d7f82] mt-1 mb-1.5">WELCOME BACK</p>
-      <h1 className="font-extrabold text-3xl">Sign in to Roll Base</h1>
-      <p className="text-[#7d7f82] mt-1 mb-1.5">Pick up where you left off.</p>
-      <form onSubmit={handleSubmit}>
-        {/* Email */}
-        <div className="mb-4">
-          <label className="mb-2 block font-medium text-[var(--color-text-primary)]">
-            Email
-          </label>
+    <div className="flex min-h-screen items-center justify-center bg-[var(--color-bg)] px-6 py-8">
+      <div
+        className="
+        container-shadow
+        w-full max-w-md
+        rounded-xl
+        border border-[var(--color-border)]
+        bg-white
+        p-6
+        sm:p-8
+      "
+      >
+        {/* Heading */}
+        <div className="mb-7 text-center">
+       
+          <p className="mb-1 text-sm font-medium text-[var(--color-primary)]">
+            Welcome back
+          </p>
 
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="Enter your email"
-            className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-muted)] focus:border-[var(--color-primary)]"
-            required
-          />
+          <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">
+            Sign in to RoleBase
+          </h1>
+
+          <p className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">
+            Pick up where you left off.
+          </p>
         </div>
-        {/* Password */}
-        <div className="mb-4 relative">
-          <label className="mb-2 block font-medium text-[var(--color-text-primary)]">
-            Password
-          </label>
 
-          <input
-            type={showPassword ? "text" : "password"}
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            placeholder="Enter your password"
-            className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-muted)] focus:border-[var(--color-primary)]"
-            required
-          />
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Email */}
+          <div>
+            <label
+              htmlFor="email"
+              className="mb-2 block text-sm font-medium text-[var(--color-text-primary)]"
+            >
+              Email
+            </label>
+
+            <input
+              id="email"
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="Enter your email"
+              className="
+              h-10 w-full
+              rounded-lg
+              border border-[var(--color-border)]
+              bg-white
+              px-3
+              text-sm
+              text-[var(--color-text-primary)]
+              outline-none
+              transition
+              placeholder:text-[var(--color-text-muted)]
+              focus:border-[var(--color-primary)]
+              focus:ring-2
+              focus:ring-[var(--color-primary-light)]
+            "
+              required
+            />
+          </div>
+
+          {/* Password */}
+          <div>
+            <label
+              htmlFor="password"
+              className="mb-2 block text-sm font-medium text-[var(--color-text-primary)]"
+            >
+              Password
+            </label>
+
+            <div className="relative">
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Enter your password"
+                className="
+                h-10 w-full
+                rounded-lg
+                border border-[var(--color-border)]
+                bg-white
+                px-3 pr-12
+                text-sm
+                text-[var(--color-text-primary)]
+                outline-none
+                transition
+                placeholder:text-[var(--color-text-muted)]
+                focus:border-[var(--color-primary)]
+                focus:ring-2
+                focus:ring-[var(--color-primary-light)]
+              "
+                required
+              />
+
+              <button
+                type="button"
+                onClick={() => setShowPassword((previous) => !previous)}
+                className="
+                absolute right-3 top-1/2
+                -translate-y-1/2
+                text-sm
+                text-[var(--color-text-secondary)]
+                transition-colors
+                hover:text-[var(--color-primary)]
+              "
+              >
+                <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+              </button>
+            </div>
+          </div>
+
+          {/* Forgot Password */}
+          <div className="text-right">
+            <button
+              type="button"
+              onClick={handleForgotPassword}
+              disabled={loading}
+              className="
+              cursor-pointer
+              text-sm font-semibold
+              text-[var(--color-primary)]
+              transition-colors
+              hover:text-[var(--color-primary-hover)]
+              hover:underline
+              disabled:cursor-not-allowed
+              disabled:opacity-60
+            "
+            >
+              {loading ? "Sending..." : "Forgot Password?"}
+            </button>
+          </div>
+
+          {/* Login Button */}
           <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-large mt-4 text-[var(--color-text-secondary)] hover:text-[var(--color-primary)]"
+            type="submit"
+            disabled={loading}
+            className="
+            btn-primary
+            mt-1
+            w-full
+            disabled:cursor-not-allowed
+            disabled:opacity-60
+          "
           >
-            <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+            Login
           </button>
-        </div>
-        {/* Button */}
-        <button type="submit" className="btn-primary mt-2 mb-4 w-full">
-         Login
-        </button>
-         {/* Message */}
-        <div className="mb-4 text-center text-sm text-[var(--color-text-secondary)]">
-          <p>{message}</p>
-        </div>
- {/* Signup */}
-        <p className="text-center text-[var(--color-text-secondary)]">
-          Don't have a account?{" "}
-          <a
-            href="/signup"
-            className="font-semibold text-[var(--color-primary)] hover:text-[var(--color-primary-hover)] hover:underline"
-          >
-            Signup
-          </a>
-        </p>
-      </form>
+
+          {/* Message */}
+          {message && (
+            <p className="text-center text-sm text-[var(--color-text-secondary)]">
+              {message}
+            </p>
+          )}
+
+          {/* Signup */}
+          <p className="text-center text-sm text-[var(--color-text-secondary)]">
+            Don't have an account?{" "}
+            <a
+              href="/signup"
+              className="
+              font-semibold
+              text-[var(--color-primary)]
+              hover:text-[var(--color-primary-hover)]
+              hover:underline
+            "
+            >
+              Sign up
+            </a>
+          </p>
+        </form>
+      </div>
     </div>
   );
 }

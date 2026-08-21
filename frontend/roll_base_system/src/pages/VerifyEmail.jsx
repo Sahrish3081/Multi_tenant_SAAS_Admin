@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 
 export default function VerifyEmail() {
@@ -7,8 +7,18 @@ export default function VerifyEmail() {
 
   const [message, setMessage] = useState("Verifying your email...");
 
+  const verificationStarted = useRef(false);
+
   useEffect(() => {
+    if (verificationStarted.current) {
+      return;
+    }
+
+    verificationStarted.current = true;
+
     const token = searchParams.get("token");
+
+    console.log("Token on frontend:", token);
 
     if (!token) {
       setMessage("Verification token is required.");
@@ -18,7 +28,10 @@ export default function VerifyEmail() {
     async function verifyEmail() {
       try {
         const response = await fetch(
-          `http://localhost:3000/api/v1/auth/verify-email?token=${encodeURIComponent(token)}`
+          `http://localhost:3000/api/v1/auth/verify-email?token=${encodeURIComponent(token)}`,
+          {
+            method: "GET",
+          },
         );
 
         const data = await response.json();
@@ -30,11 +43,9 @@ export default function VerifyEmail() {
 
         setMessage("Email verified successfully!");
 
-        // After successful verification
         setTimeout(() => {
           navigate("/login");
         }, 2000);
-
       } catch (error) {
         console.error("Verification error:", error);
         setMessage("Something went wrong. Please try again.");
@@ -45,13 +56,25 @@ export default function VerifyEmail() {
   }, [searchParams, navigate]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <div className="rounded-xl border p-8 text-center">
-        <h1 className="mb-4 text-2xl font-bold">
+    <div className="flex min-h-screen items-center justify-center bg-[var(--color-bg)] px-4">
+      <div
+        className=" container-shadow w-full max-w-md  rounded-xl  border border-[var(--color-border)]  bg-white  p-8  text-center "
+      >
+        <h1 className="mb-4 text-2xl font-bold text-[var(--color-text-primary)]">
           Email Verification
         </h1>
 
-        <p>{message}</p>
+        <p className="text-sm leading-6 text-[var(--color-text-secondary)]">
+          {message}
+        </p>
+
+        <button
+          type="button"
+          onClick={() => navigate("/login")}
+          className="btn-primary mt-6"
+        >
+          Go to Login
+        </button>
       </div>
     </div>
   );
