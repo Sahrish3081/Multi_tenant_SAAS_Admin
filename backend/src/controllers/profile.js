@@ -1,7 +1,7 @@
 import { db } from "#config/client.js";
 import { users } from "#drizzle/schema.js";
 import { eq } from "drizzle-orm";
-export function profileController(req, res) {
+export async function profileController(req, res) {
     const userId=req.user.id;
     try{
 
