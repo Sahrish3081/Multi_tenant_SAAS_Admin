@@ -73,7 +73,7 @@ export default function SignupCard() {
     }
   }
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[var(--color-bg)] px-4 py-8">
+    <div className="flex min-h-screen items-center justify-center bg-[#E5EEE4] px-4 py-8">
       <div
         className="
         container-shadow
@@ -87,8 +87,6 @@ export default function SignupCard() {
       >
         {/* Heading */}
         <div className="mb-7 text-center">
-         
-
           <p className="mb-1 text-sm font-medium text-[var(--color-primary)]">
             Get started
           </p>

@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+// Import the core React component
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useSearchParams, useNavigate } from "react-router-dom";
+
 export default function ResetPassword() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -59,28 +61,25 @@ export default function ResetPassword() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-           new_password: formData.password,
-          confirm_password: formData.confirmPassword,
+            new_password: formData.password,
+            confirm_password: formData.confirmPassword,
           }),
         },
       );
 
       const data = await response.json();
-     
-console.log(
-  "Reset password response:",
-  JSON.stringify(data, null, 2),
-);
 
-console.log("Status:", response.status);
+      console.log("Reset password response:", JSON.stringify(data, null, 2));
+
+      console.log("Status:", response.status);
 
       if (!response.ok) {
-  console.log("Reset password response:", data);
-  console.log("Status:", response.status);
+        console.log("Reset password response:", data);
+        console.log("Status:", response.status);
 
-  setMessage(data.message || `Reset failed (${response.status})`);
-  return;
-}
+        setMessage(data.message || `Reset failed (${response.status})`);
+        return;
+      }
 
       setMessage("Password reset successfully!");
 
@@ -96,7 +95,7 @@ console.log("Status:", response.status);
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[var(--color-bg)] px-4 py-8">
+    <div className="flex min-h-screen items-center justify-center bg-[#E5EEE4] px-4 py-8">
       <div
         className="
           container-shadow
@@ -110,8 +109,6 @@ console.log("Status:", response.status);
       >
         {/* Heading */}
         <div className="mb-7 text-center">
-         
-
           <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">
             Reset Password
           </h1>
@@ -164,8 +161,9 @@ console.log("Status:", response.status);
                   absolute right-3 top-1/2
                   -translate-y-1/2
                   text-xs font-semibold
-                  text-[var(--color-primary)]
-                  hover:text-[var(--color-primary-hover)]
+                  text-[var(--color-text-secondary)]
+                transition-colors
+                hover:text-[var(--color-primary)]
                 "
               >
                 <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
@@ -209,18 +207,19 @@ console.log("Status:", response.status);
 
               <button
                 type="button"
-                onClick={() =>
-                  setShowConfirmPassword((previous) => !previous)
-                }
+                onClick={() => setShowConfirmPassword((previous) => !previous)}
                 className="
                   absolute right-3 top-1/2
                   -translate-y-1/2
                   text-xs font-semibold
-                  text-[var(--color-primary)]
-                  hover:text-[var(--color-primary-hover)]
+                  text-[var(--color-text-secondary)]
+                transition-colors
+                hover:text-[var(--color-primary)]
                 "
               >
-                {showConfirmPassword ? "Hide" : "Show"}
+                <FontAwesomeIcon
+                  icon={showConfirmPassword ? faEyeSlash : faEye}
+                />
               </button>
             </div>
           </div>

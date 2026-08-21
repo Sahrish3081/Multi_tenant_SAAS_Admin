@@ -96,7 +96,7 @@ export default function LoginCard() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[var(--color-bg)] px-6 py-8">
+    <div className="flex min-h-screen items-center justify-center bg-[#E5EEE4] px-6 py-8">
       <div
         className="
         container-shadow
@@ -221,7 +221,7 @@ export default function LoginCard() {
               disabled={loading}
               className="
               cursor-pointer
-              text-sm font-semibold
+              text-sm 
               text-[var(--color-primary)]
               transition-colors
               hover:text-[var(--color-primary-hover)]
@@ -230,7 +230,7 @@ export default function LoginCard() {
               disabled:opacity-60
             "
             >
-              {loading ? "Sending..." : "Forgot Password?"}
+              {loading ? "Sending..." : "Forgot?"}
             </button>
           </div>
 
@@ -240,7 +240,6 @@ export default function LoginCard() {
             disabled={loading}
             className="
             btn-primary
-            mt-1
             w-full
             disabled:cursor-not-allowed
             disabled:opacity-60
