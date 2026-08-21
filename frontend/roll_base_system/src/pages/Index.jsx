@@ -1,6 +1,6 @@
 import Header from "../assets/components/Header";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {faShieldHalved, faUserGroup,} from "@fortawesome/free-solid-svg-icons";
+import { faShieldHalved, faUserGroup } from "@fortawesome/free-solid-svg-icons";
 import { faBuilding } from "@fortawesome/free-regular-svg-icons";
 import Footer from "../assets/components/Footer";
 
@@ -9,7 +9,7 @@ export default function Index() {
     <>
       <Header />
 
-      <div className="flex min-h-screen flex-col items-center justify-center gap-7 bg-[#f4f7f4] px-6 py-12">
+      <div className="flex min-h-screen flex-col items-center justify-center gap-7 bg-[#E5EEE4] px-6 py-12">
         {/* Hero Section */}
         <div className="text-center">
           <p className="text-[var(--color-primary)] sm:text-1xl md:text-1xl">
@@ -28,20 +28,15 @@ export default function Index() {
 
           <div className="mt-5 flex items-center justify-center gap-12">
             <a href="/signup" className="btn-primary px-5 py-2">
-              Get Started{" "}
-              <span className="text-lg font-extrabold leading-none">
-                →
-              </span>
+              Get Started 
             </a>
 
             <a
               href="/login"
               className="btn-secondary group text-[#67696e] hover:text-white"
             >
-              Login{" "}
-              <span className="-mt-0.1 text-xl font-extrabold text-[#2060e0] transition-colors group-hover:text-white">
-                →
-              </span>
+              Login
+            
             </a>
           </div>
         </div>
@@ -69,9 +64,7 @@ export default function Index() {
               <FontAwesomeIcon icon={faUserGroup} size="lg" />
             </h1>
 
-            <h2 className="mb-2 mt-2 font-bold text-[#17181a]">
-              Workspace
-            </h2>
+            <h2 className="mb-2 mt-2 font-bold text-[#17181a]">Workspace</h2>
 
             <p className="mt-2 text-[#7a7d84]">
               Control access to specific teams and projects.
@@ -84,9 +77,7 @@ export default function Index() {
               <FontAwesomeIcon icon={faBuilding} size="lg" />
             </h1>
 
-            <h2 className="mb-2 mt-2 font-bold text-[#17181a]">
-              Permissions
-            </h2>
+            <h2 className="mb-2 mt-2 font-bold text-[#17181a]">Permissions</h2>
 
             <p className="mt-2 text-[#7a7d84]">
               Define what users can actually do.
@@ -96,7 +87,7 @@ export default function Index() {
       </div>
 
       {/* How it works / Why RoleBase */}
-      <section className="w-full bg-[#f4f7f4] px-6 py-10">
+      <section className="w-full bg-[#E5EEE4] px-6 py-10">
         <div className="mx-auto max-w-5xl text-center">
           <h2 className="font-extrabold text-black sm:text-3xl md:text-3xl">
             Everything You Need to Manage Access
@@ -127,8 +118,8 @@ export default function Index() {
               </h2>
 
               <p className="mt-2 text-center text-sm leading-6 text-[#7a7d84]">
-                Define clear roles and permissions so every user gets the
-                access they need.
+                Define clear roles and permissions so every user gets the access
+                they need.
               </p>
             </div>
 
