@@ -6,7 +6,10 @@ import cors from "cors";
 dotenv.config();
 const app = express();
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: [
+    "http://localhost:5173",
+    "https://sculptor-freebee-babbling.ngrok-free.dev"
+  ],
 }));
 app.use(express.json());
 app.use("/api/v1/", router);
