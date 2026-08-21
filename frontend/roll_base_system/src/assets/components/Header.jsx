@@ -1,6 +1,6 @@
 export default function Header() {
   return (
-    <header className="border-b border-[var(--color-border)] bg-[var(--color-surface)]">
+    <header className="border-b border-[var(--color-inherited-border)] bg-white shadow-[0_8px_30px_10px_rgba(0,0,0,0.10)]">
       <div
         className=" mx-auto flex max-w-7xl flex-col gap-4  px-4 py-3  sm:flex-row sm:items-center sm:justify-between  sm:px-6 sm:py-0  sm:h-16 ">
          {/* Logo */}
