@@ -96,7 +96,7 @@ export default function LoginCard() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#E5EEE4] px-6 py-8">
+    <div className="flex items-center  bg-[#E5EEE4] px-6 mt-4">
       <div
         className="
         container-shadow
@@ -110,7 +110,6 @@ export default function LoginCard() {
       >
         {/* Heading */}
         <div className="mb-7 text-center">
-       
           <p className="mb-1 text-sm font-medium text-[var(--color-primary)]">
             Welcome back
           </p>

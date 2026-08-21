@@ -73,7 +73,7 @@ export default function SignupCard() {
     }
   }
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#E5EEE4] px-4 py-8">
+    <div className="flex  items-center justify-center bg-[#E5EEE4] px-4 py-8">
       <div
         className="
         container-shadow
@@ -81,7 +81,7 @@ export default function SignupCard() {
         rounded-xl
         border border-[var(--color-border)]
         bg-white
-        p-6
+        p-3
         sm:p-8
       "
       >

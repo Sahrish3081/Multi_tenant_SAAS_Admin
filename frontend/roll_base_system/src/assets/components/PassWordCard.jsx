@@ -61,9 +61,9 @@ export default function PasswordCard() {
           body: JSON.stringify({
             old_password: formData.currentPassword,
             new_password: formData.password,
-            confirm_password: formData.confirmPassword
+            confirm_password: formData.confirmPassword,
           }),
-        }
+        },
       );
 
       const data = await response.json();
@@ -91,9 +91,7 @@ export default function PasswordCard() {
   return (
     <div className="mt-6 overflow-hidden rounded-[18px] border border-[#dededc] bg-white container-shadow">
       <div className="border-b border-[#e7e7e5] px-5 py-4">
-        <h2 className="text-[15px] font-semibold text-[#17181a]">
-          Password
-        </h2>
+        <h2 className="text-[15px] font-semibold text-[#17181a]">Password</h2>
 
         <p className="mt-1 text-[13px] text-[#66686d]">
           Update your password to keep your account secure.
@@ -134,9 +132,7 @@ export default function PasswordCard() {
 
             <button
               type="button"
-              onClick={() =>
-                setShowCurrentPassword((previous) => !previous)
-              }
+              onClick={() => setShowCurrentPassword((previous) => !previous)}
               className="
                 absolute right-3 top-1/2
                 -translate-y-1/2
@@ -201,14 +197,10 @@ export default function PasswordCard() {
                 hover:text-[var(--color-primary)]
               "
               aria-label={
-                showNewPassword
-                  ? "Hide new password"
-                  : "Show new password"
+                showNewPassword ? "Hide new password" : "Show new password"
               }
             >
-              <FontAwesomeIcon
-                icon={showNewPassword ? faEyeSlash : faEye}
-              />
+              <FontAwesomeIcon icon={showNewPassword ? faEyeSlash : faEye} />
             </button>
           </div>
         </div>
@@ -246,9 +238,7 @@ export default function PasswordCard() {
 
             <button
               type="button"
-              onClick={() =>
-                setShowConfirmPassword((previous) => !previous)
-              }
+              onClick={() => setShowConfirmPassword((previous) => !previous)}
               className="
                 absolute right-3 top-1/2
                 -translate-y-1/2

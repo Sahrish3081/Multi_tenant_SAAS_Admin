@@ -3,7 +3,7 @@ import { useState } from "react";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useSearchParams, useNavigate } from "react-router-dom";
-
+import AuthHeader from "../assets/components/AuthHeader";
 export default function ResetPassword() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -95,7 +95,14 @@ export default function ResetPassword() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#E5EEE4] px-4 py-8">
+       
+     <>
+         <div className="min-h-screen bg-[#E5EEE4]">
+      <AuthHeader />
+    
+      <main className="flex justify-center pt-8">
+      
+    <div className="flex items-center justify-center bg-[#E5EEE4] px-4 py-8">
       <div
         className="
           container-shadow
@@ -265,5 +272,8 @@ export default function ResetPassword() {
         </div>
       </div>
     </div>
+      </main>
+    </div>
+    </>
   );
 }
