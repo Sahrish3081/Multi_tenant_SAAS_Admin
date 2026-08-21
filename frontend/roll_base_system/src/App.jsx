@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard.jsx";
  import VerifyEmail from "./pages/VerifyEmail.jsx";
  import ResetPassword from "./pages/ResetPassword.jsx";
 import Profile from "./pages/Profile.jsx";
+import CreateWorkspace from "./pages/workspace.jsx";
 function App() {
   return (
     <BrowserRouter>
@@ -20,6 +21,7 @@ function App() {
          <Route path="/verify-email" element={<VerifyEmail />} />
          <Route path="/reset-password" element={<ResetPassword />} />
          <Route path="/profile" element={<Profile/>}/>
+         <Route path="/create-workspace" element={<CreateWorkspace/>}/>
       </Routes>
     </BrowserRouter>
   );
