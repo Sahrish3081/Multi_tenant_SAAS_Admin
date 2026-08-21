@@ -1,68 +1,124 @@
 @import "tailwindcss";
+
 :root {
   /* Base / neutral scale */
-  --color-bg: #F9FAFB;
+  --color-bg: #f9fafb;
   --color-surface: #f7eeee;
-  --color-surface-alt: #F3F4F6;
+  --color-surface-alt: #f3f4f6;
   --color-border: #d4d6d9;
-  --color-border-strong: #D1D5DB;
-
+  --color-border-strong: #d1d5db;
   --color-text-primary: #111827;
-  --color-text-secondary: #6B7280;
-  --color-text-muted: #9CA3AF;
+  --color-text-secondary: #6b7280;
+  --color-text-muted: #9ca3af;
 
-  /* Primary accent (actions, links, focus rings) */
-  --color-primary: #4F46E5;
-  --color-primary-hover: #4338CA;
-  --color-primary-light: #EEF2FF;
-  --color-primary-text: #4338CA;
+  /* Primary accent */
+  --color-primary: #4f46e5;
+  --color-primary-hover: #4338ca;
+  --color-primary-light: #eef2ff;
+  --color-primary-text: #4338ca;
 
   /* Status colors */
-  --color-success: #16A34A;
-  --color-success-bg: #F0FDF4;
-  --color-success-border: #BBF7D0;
+  --color-success: #16a34a;
+  --color-success-bg: #f0fdf4;
+  --color-success-border: #bbf7d0;
 
-  --color-warning: #D97706;
-  --color-warning-bg: #FFFBEB;
-  --color-warning-border: #FDE68A;
+  --color-warning: #d97706;
+  --color-warning-bg: #fffbeb;
+  --color-warning-border: #fde68a;
 
-  --color-danger: #DC2626;
-  --color-danger-bg: #FEF2F2;
-  --color-danger-border: #FECACA;
+  --color-danger: #dc2626;
+  --color-danger-bg: #fef2f2;
+  --color-danger-border: #fecaca;
 
-  --color-inherited: #6B7280;
-  --color-inherited-bg: #F3F4F6;
-  --color-inherited-border: #E5E7EB;
+  --color-inherited: #6b7280;
+  --color-inherited-bg: #f3f4f6;
+  --color-inherited-border: #e5e7eb;
 
-  /* Role badge colors (org roles) */
-  --color-role-owner: #7C3AED;
-  --color-role-owner-bg: #F5F3FF;
+  /* Role badge colors */
+  --color-role-owner: #7c3aed;
+  --color-role-owner-bg: #f5f3ff;
 
-  --color-role-admin: #4F46E5;
-  --color-role-admin-bg: #EEF2FF;
+  --color-role-admin: #4f46e5;
+  --color-role-admin-bg: #eef2ff;
 
-  --color-role-member: #6B7280;
-  --color-role-member-bg: #F3F4F6;
+  --color-role-member: #6b7280;
+  --color-role-member-bg: #f3f4f6;
 
-  /* Role badge colors (workspace roles) */
-  --color-role-editor: #0891B2;
-  --color-role-editor-bg: #ECFEFF;
+  /* Workspace roles */
+  --color-role-editor: #0891b2;
+  --color-role-editor-bg: #ecfeff;
 
-  --color-role-viewer: #64748B;
-  --color-role-viewer-bg: #F1F5F9;
+  --color-role-viewer: #64748b;
+  --color-role-viewer-bg: #f1f5f9;
 }
-/* button class */
+/* shadow apply on containers */
+.container-shadow {
+  box-shadow:
+    0 4px 6px -1px rgb(0 0 0 / 0.12),
+    0 2px 4px -2px rgb(0 0 0 / 0.13);
+}
+/* primary buttons */
 .btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
   background-color: var(--color-primary);
   color: white;
+  border: none;
   border-radius: 0.5rem;
-  padding: 0.75rem 1rem;
   font-weight: 600;
-  transition: background-color 150ms ease;
+  cursor: pointer;
+  transition:
+    background-color 150ms ease,
+    box-shadow 150ms ease,
+    transform 150ms ease;
 }
 
 .btn-primary:hover {
   background-color: var(--color-primary-hover);
+
+  box-shadow:
+    0 4px 6px -1px rgb(79 70 229 / 0.25),
+    0 2px 4px -2px rgb(79 70 229 / 0.2);
+}
+
+.btn-primary:active {
+  transform: translateY(1px);
+}
+
+/*    Secondary Button */
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 120px;
+  height: 40px;
+
+  background-color: white;
+  color: var(--color-text-secondary);
+
+  border: 1px solid var(--color-primary);
+  border-radius: 0.5rem;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background-color 150ms ease,
+    color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-primary);
+  color: white;
+
+  box-shadow:
+    0 4px 6px -1px rgb(79 70 229 / 0.2),
+    0 2px 4px -2px rgb(79 70 229 / 0.15);
 }
 .btn-secondary {
   background-color: white;
