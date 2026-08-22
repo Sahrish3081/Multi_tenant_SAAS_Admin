@@ -3,7 +3,6 @@ import { workspace, workspaceMembers, users } from "#drizzle/schema.js";
 import { eq } from "drizzle-orm";
 import { workspaceNameValidation } from "#validators/authValidation.js";
 import { createAuditLog } from "#controllers/auditLogs.js";
-import { id } from "zod/v4/locales";
 export async function workspaceCreate(req, res) {
   const { workspaceName } = req.body;
 
@@ -12,19 +11,20 @@ export async function workspaceCreate(req, res) {
       message: "Workspace name is required",
     });
   }
-  /* apply email validation  */
+
   const validation = workspaceNameValidation.safeParse(req.body);
+
   if (!validation.success) {
     return res.status(400).json({
       success: false,
-      message: "Workspace name  Validation failed",
+      message: "Workspace name Validation failed",
       errors: validation.error.flatten().fieldErrors,
     });
   }
 
   const createdBy = req.user.id;
+
   try {
-    // Get creator's username
     const user = await db
       .select({
         id: users.id,
@@ -39,7 +39,6 @@ export async function workspaceCreate(req, res) {
       });
     }
 
-    // Create workspace
     const [newWorkspace] = await db
       .insert(workspace)
       .values({
@@ -50,7 +49,6 @@ export async function workspaceCreate(req, res) {
         id: workspace.id,
       });
 
-    // Creator automatically becomes Owner
     await db.insert(workspaceMembers).values({
       memberName: user[0].name,
       userId: createdBy,
@@ -59,36 +57,27 @@ export async function workspaceCreate(req, res) {
       assignedBy: createdBy,
     });
 
-    return res.status(201).json({
-      message: `${workspaceName} Workspace is successfully created`,
-      workspaceId: newWorkspace.id,
-      role: "owner",
-    });
-  } catch (error) {
-    console.log("Workspace Error :", error);
-
-    return res.status(500).json({
-      message: "Internal server error",
-      error: error.message,
-    });
-  } finally {
-    try
-    {
-
     const auditResult = await createAuditLog({
       performedBy: createdBy,
       action: "Create workspace",
       affectedUser: null,
     });
-    //console.log(`auditResult `, auditResult)
-    return res.status(200).json({
+
+    return res.status(201).json({
       success: true,
-      message: "Transfer ownership  successfully",
+      message: `${workspaceName} Workspace is successfully created`,
+      workspaceId: newWorkspace.id,
+      role: "owner",
+      workspace: newWorkspace,
       audit: auditResult.message,
     });
-    }
-    catch (error) {
-      console.log("finally block error: ", error)
-    }
+  } catch (error) {
+    console.log("Workspace Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
   }
 }

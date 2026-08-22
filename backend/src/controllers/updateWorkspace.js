@@ -4,7 +4,7 @@ import { eq } from 'drizzle-orm';
 import { createAuditLog } from '#controllers/auditLogs.js';
 export async function updateWorkspace(req, res) {
   const userId = req.user.id;
-  const { workspaceId } = req.body;
+  const { workspaceId } = req.query;
   const workspaceName = req.body.workspaceName;
 
   try {
@@ -30,7 +30,8 @@ export async function updateWorkspace(req, res) {
     return res.status(200).json({
       message: `Workspace name updated to ${workspaceName} successfully`,
     });
-  } catch (error) {
+  }
+   catch (error) {
     console.log("Update workspace name Error:", error);
     return res.status(500).json({
       message: "Internal server error",

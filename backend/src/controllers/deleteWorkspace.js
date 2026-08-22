@@ -1,18 +1,24 @@
 import { db } from "#config/client.js";
-import { workspace, workspaceMembers, invitations } from "#drizzle/schema.js";
+import {
+  workspace,
+  workspaceMembers,
+  invitations,
+} from "#drizzle/schema.js";
 import { and, eq } from "drizzle-orm";
-import { createAuditLog } from '#controllers/auditLogs.js';
+import { createAuditLog } from "#controllers/auditLogs.js";
 
 export async function deleteWorkspace(req, res) {
   const userId = req.user.id;
-  const { workspaceId } = req.body; 
+  const { workspaceId } = req.body;
 
   if (!workspaceId) {
-    return res.status(400).json({ message: "Workspace ID is required" });
+    return res.status(400).json({
+      message: "Workspace ID is required",
+    });
   }
 
   try {
-    /* Verify this SPECIFIC workspace exists AND belongs to the logged-in user */
+    // Check that this workspace belongs to the logged-in owner
     const [workspaceExist] = await db
       .select({
         id: workspace.id,
@@ -26,54 +32,47 @@ export async function deleteWorkspace(req, res) {
         )
       );
 
-    // allows us to check workspace exist or not
     if (!workspaceExist) {
       return res.status(404).json({
-        message: "Workspace not found, or you do not have permission to delete it.",
+        message:
+          "Workspace not found, or you do not have permission to delete it.",
       });
     }
 
-    //  child tables FIRST to respect foreign keys
+    // Delete child records first
     await db.transaction(async (tx) => {
-      
-      // clear out invitations  to this workspace
       await tx
         .delete(invitations)
         .where(eq(invitations.workspaceId, workspaceId));
 
-      // clear out all recorded workspace members
       await tx
         .delete(workspaceMembers)
         .where(eq(workspaceMembers.workspaceId, workspaceId));
 
-      //  delete the parent workspace container safely
       await tx
         .delete(workspace)
         .where(eq(workspace.id, workspaceId));
     });
 
-    return res.status(200).json({
-      message: "Workspace and all related data removed successfully",
+    // Audit log
+    const auditResult = await createAuditLog({
+      performedBy: userId,
+      action: "Delete workspace",
+      affectedUser: null,
     });
 
+    return res.status(200).json({
+      success: true,
+      message: "Workspace deleted successfully",
+      audit: auditResult.message,
+    });
   } catch (error) {
     console.log("Delete Workspace Error:", error);
+
     return res.status(500).json({
+      success: false,
       message: "Internal server error",
       error: error.message,
     });
-  }
-  finally{
-     const auditResult = await createAuditLog({
-       performedBy: req.user.id,
-       action: "Delete workspace",
-       affectedUser: req.params.workspaceId,
-});
-
-return res.status(200).json({
-  success: true,
-  message: "Delete workspace successfully",
-  audit: auditResult.message,
-});
   }
 }

@@ -23,16 +23,12 @@ const workspace = express.Router();
 workspace.use(authMiddleware);
 
 workspace.post("/", workspaceCreate);
-
-workspace.patch("/", ownerMiddleware, updateWorkspace);
+workspace.get("/my-workspaces", getMyWorkspace);
+workspace.patch("/update/:workspaceId", ownerMiddleware, updateWorkspace);
 
 workspace.delete("/", ownerMiddleware, deleteWorkspace);
 
-workspace.post(
-  "/transfer-ownership",
-  ownerMiddleware,
-  transferWorkspaceOwnership,
-);
+workspace.post("/transfer-ownership/workspaceId",ownerMiddleware,transferWorkspaceOwnership,);
 
 //One GET endpoint with optional filters.
 
@@ -41,9 +37,9 @@ workspace.post(
 //   /members?workspaceId=123&memberId=456
 //   /members?workspaceId=123&role=admin
 
-workspace.get( "/:workspaceId/members/:memberId",authMiddleware, ownerOrAdminMiddleware,  getWorkspaceMembers
-);
+workspace.get( "/:workspaceId/members",authMiddleware,ownerOrAdminMiddleware,getWorkspaceMembers);
 
+workspace.get("/:workspaceId/members/:memberId",authMiddleware,ownerOrAdminMiddleware,getWorkspaceMembers);
 workspace.get("/:workspaceId/members/role/:role",authMiddleware,ownerOrAdminMiddleware,getMemberOnBaseOfRole);
 workspace.delete("/member/:memberId", ownerOrAdminMiddleware, deleteMember);
 
