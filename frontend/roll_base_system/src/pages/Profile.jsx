@@ -52,7 +52,7 @@ export default function Profile() {
   }, []);
 
   return (
-    <>
+    <main className=" bg-[#E5EEE4]">
       <div className="min-h-screen bg-[#f4f7f4] px-6 py-10 sm:px-8 ">
         <div className="mx-auto w-full max-w-[825px]">
           <div className="border-b border-[#e5e5e5] pb-7">
@@ -188,6 +188,6 @@ export default function Profile() {
           </div>
         </div>
       </div>
-    </>
+    </main>
   );
 }

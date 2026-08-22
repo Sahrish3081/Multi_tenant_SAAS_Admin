@@ -42,7 +42,7 @@ export default function SignupCard() {
 
       const data = await response.json();
 
-      console.log("Status:", response.status);
+     
       console.log("Data:", data);
 
       if (!response.ok) {
