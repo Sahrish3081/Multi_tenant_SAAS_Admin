@@ -18,12 +18,26 @@ function App() {
         <Route path="/" element={<Index />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login/>}/>
-        <Route path="/dashboard" element={<ProtectedRoute> <Dashboard/></ProtectedRoute> }/>
          <Route path="/verify-email" element={<VerifyEmail />} />
          <Route path="/reset-password" element={<ResetPassword />} />
-         <Route path="/profile" element={<Profile/>}/>
+        {/* Dashboard */}
+        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>}>
+          <Route index element={<Profile />} />
+
+          <Route path="profile" element={<Profile />} />
+
+          <Route path="workspace" element={<MyWorkspace />} />
+
+          {/* <Route path="members" element={<Members />} />
+
+          <Route path="activity" element={<Activity />} /> */}
+
+          <Route path="create-workspace" element={<CreateWorkspace />}/>
+        </Route>
+        
+         {/* <Route path="/profile" element={<Profile/>}/>
          <Route path="/create-workspace" element={<CreateWorkspace/>}/>
-         <Route path="/my-workspace" element={<MyWorkspace/>}/>
+         <Route path="/my-workspace" element={<MyWorkspace/>}/> */}
       </Routes>
     </BrowserRouter>
   );
