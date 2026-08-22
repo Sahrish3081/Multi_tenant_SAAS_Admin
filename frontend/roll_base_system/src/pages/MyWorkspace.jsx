@@ -341,28 +341,68 @@ export default function MyWorkspace() {
 
   /* leave workspace */
   async function handleLeaveWorkspace() {
-    if (workspace?.role === "owner") {
-      return;
-    }
+  if (workspace?.role === "owner") {
+    setMessage(
+      "Workspace owner cannot leave. Transfer ownership first."
+    );
+    setMessageType("error");
+    return;
+  }
 
-    const confirmed = window.confirm(
-      "Are you sure you want to leave this workspace?"
+  const confirmed = window.confirm(
+    "Are you sure you want to leave this workspace?"
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  const token = localStorage.getItem("token");
+  const workspaceId = workspace?.workspaceId;
+
+  if (!workspaceId) {
+    setMessage("Workspace not found.");
+    setMessageType("error");
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `http://localhost:3000/api/v1/workspace/leave/${workspaceId}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
 
-    if (!confirmed) {
+    const data = await response.json();
+
+    if (!response.ok) {
+      setMessage(data.message || "Failed to leave workspace.");
+      setMessageType("error");
       return;
     }
 
-    /*
-     * Aapke current backend routes mein
-     * leave workspace endpoint nahi hai.
-     *
-     * Jab endpoint banega, yahan fetch call add hogi.
-     */
+    setMessage(
+      data.message || "You have left the workspace successfully."
+    );
+    setMessageType("success");
 
-    setMessage("Leave workspace endpoint is not available yet.");
+    // Remove workspace from current page
+    setWorkspace(null);
+
+    setFormData({
+      workspaceName: "",
+    });
+  } catch (error) {
+    console.error("Leave workspace error:", error);
+
+    setMessage("Something went wrong.");
     setMessageType("error");
   }
+}
 
   if (loading) {
     return (
