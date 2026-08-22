@@ -7,7 +7,7 @@ import { ownerOrAdminMiddleware } from "#middleware/ownerOrAdmin.js";
 import { workspaceCreate } from "#controllers/workspace.js";
 import { deleteMember } from "#controllers/deleteMembers.js";
 import { changeRole } from "#controllers/changeRole.js";
-
+import { leaveWorkspace } from "#controllers/leaveWorkspace.js";
 import { getMyWorkspace } from "#controllers/getMyWorkspace.js";
 import { getWorkspaceMembers } from "#controllers/getWorkspaceMembers.js";
 import { getMemberOnBaseOfRole } from "#controllers/onBaseOfRole.js";
@@ -27,7 +27,8 @@ workspace.get("/my-workspaces", getMyWorkspace);
 workspace.patch("/update/:workspaceId", ownerMiddleware, updateWorkspace);
 
 workspace.delete("/", ownerMiddleware, deleteWorkspace);
-
+/* member delete itself from the workspace */
+workspace.delete("/leave/:workspaceId",leaveWorkspace);
 workspace.post("/transfer-ownership/workspaceId",ownerMiddleware,transferWorkspaceOwnership,);
 
 //One GET endpoint with optional filters.
